@@ -7,14 +7,17 @@ namespace FinancialSystem.Application.Services;
 public class LoanService
 {
     private readonly IFinancialCalculator _calculator;
+    private readonly ILoanRepository _loanRepository;
     private readonly IUserRepository _userRepository;
     private readonly IBankRepository _bankRepository;
 
-    public LoanService(IFinancialCalculator calculator, IUserRepository userRepository, IBankRepository bankRepository)
+    public LoanService(IFinancialCalculator calculator, IUserRepository userRepository,
+        IBankRepository bankRepository, ILoanRepository loanRepository)
     {
         _calculator = calculator;
         _userRepository = userRepository;
         _bankRepository = bankRepository;
+        _loanRepository = loanRepository;
     }
 
     public async Task<Loan> CreateLoanAsync(LoanDto dto)
@@ -34,6 +37,10 @@ public class LoanService
             throw new ApplicationException($"Bank with id: {dto.BankId} does not exist.");
         }
         
-        return new Loan(borrower, bank, dto.Amount, dto.TermInMonths, dto.InterestRate, totalAmount, monthlyPayment, dto.StartDate);
+        var loan = new Loan(borrower, bank, dto.Amount, dto.TermInMonths, dto.InterestRate, totalAmount, monthlyPayment, dto.StartDate);
+        
+        await _loanRepository.AddAsync(loan);
+
+        return loan;
     }
 }

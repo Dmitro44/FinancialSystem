@@ -15,7 +15,7 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> GetByIdAsync(int userId)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        return await _context.Users.FindAsync(userId);
     }
 
     public async Task AddAsync(User user)
@@ -26,7 +26,7 @@ public class UserRepository : IUserRepository
 
     public async Task UpdateAsync(User user)
     {
-        var userToUpdate = await _context.Users.FirstOrDefaultAsync(u => u.Id == user.Id);
+        var userToUpdate = await _context.Users.FindAsync(user.Id);
         if (userToUpdate == null)
         {
             throw new ArgumentNullException(nameof(user));
