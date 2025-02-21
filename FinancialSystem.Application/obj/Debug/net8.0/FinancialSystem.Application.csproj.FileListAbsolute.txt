@@ -1,0 +1,15 @@
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\bin\Debug\net8.0\FinancialSystem.Application.deps.json
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\bin\Debug\net8.0\FinancialSystem.Application.dll
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\bin\Debug\net8.0\FinancialSystem.Application.pdb
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\bin\Debug\net8.0\FinancialSystem.Domain.dll
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\bin\Debug\net8.0\FinancialSystem.Domain.pdb
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\FinancialSystem.Application.csproj.AssemblyReference.cache
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\FinancialSystem.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\FinancialSystem.Application.AssemblyInfoInputs.cache
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\FinancialSystem.Application.AssemblyInfo.cs
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\FinancialSystem.Application.csproj.CoreCompileInputs.cache
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\Financia.E4470C54.Up2Date
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\FinancialSystem.Application.dll
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\refint\FinancialSystem.Application.dll
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\FinancialSystem.Application.pdb
+C:\Users\Dima\RiderProjects\FinancialSystem\FinancialSystem.Application\obj\Debug\net8.0\ref\FinancialSystem.Application.dll
