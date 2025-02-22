@@ -1,0 +1,32 @@
+@model FinancialSystem.Web.Models.LoginViewModel
+
+@{
+    ViewData["BodyClass"] = "login-page";
+    ViewData["Title"] = "Sign in";
+}
+
+<head>
+    <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true"/>
+</head>
+<body class="login-page">
+    <div class="login">
+        <h2>Login</h2>
+        <form class="form" asp-action="Login" method="post">
+            <div class="textbox">
+                <input asp-for="Email" type="email" placeholder=" "/>
+                <span asp-validation-for="Email" class="field-validation-error"></span>
+                <label asp-for="Email"></label>
+            </div>
+            <div class="textbox">
+                <input asp-for="Password" type="password" placeholder=" "/>
+                <span asp-validation-for="Password" class="field-validation-error"></span>
+                <label asp-for="Password"></label>
+            </div>
+            
+            <button type="submit">Sign In</button>
+        </form>
+        <p>
+            Don't have an acccount? <a>Sign up!</a>
+        </p>
+    </div>
+</body>

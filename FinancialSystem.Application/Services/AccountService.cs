@@ -10,7 +10,8 @@ public class AccountService
     private readonly IUserRepository _userRepository;
     private readonly IBankRepository _bankRepository;
 
-    public AccountService(IUserRepository userRepository, IBankRepository bankRepository, IAccountRepository accountRepository)
+    public AccountService(IUserRepository userRepository, IBankRepository bankRepository,
+        IAccountRepository accountRepository)
     {
         _userRepository = userRepository;
         _bankRepository = bankRepository;
