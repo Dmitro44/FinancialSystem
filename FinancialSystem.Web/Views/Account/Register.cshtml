@@ -6,32 +6,135 @@
 <head>
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true"/>
 </head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 <body class="register-page">
     <div class="register">
         <h2>Registration</h2>
         <form class="form" asp-action="Register" method="post">
             <div class="textbox">
+                <input asp-for="LastName" type="text" placeholder=" "/>
+                <span asp-validation-for="LastName" class="field-validation-error"></span>
+                <label asp-for="LastName">Last name</label>
+            </div>
+                    
+            <div class="textbox">
+                <input asp-for="FirstName" type="text" placeholder=" "/>
+                <span asp-validation-for="FirstName" class="field-validation-error"></span>
+                <label asp-for="FirstName">First name</label>
+            </div>
+                    
+            <div class="textbox">
+                <input asp-for="Patronymic" type="text" placeholder=" "/>
+                <span asp-validation-for="Patronymic" class="field-validation-error"></span>
+                <label asp-for="Patronymic">Patronymic</label>
+            </div>
+
+            <div class="textbox">
+                <input asp-for="PassportSeries" type="text" placeholder=" "/>
+                <span asp-validation-for="PassportSeries" class="field-validation-error"></span>
+                <label asp-for="PassportSeries">Passport series</label>
+            </div>
+
+            <div class="textbox">
+                <input asp-for="PassportNumber" type="text" placeholder=" "/>
+                <span asp-validation-for="PassportNumber" class="field-validation-error"></span>
+                <label asp-for="PassportNumber">Passport number</label>
+            </div>
+
+            <div class="textbox">
+                <input asp-for="IdentificationNumber" type="text" placeholder=" "/>
+                <span asp-validation-for="IdentificationNumber" class="field-validation-error"></span>
+                <label asp-for="IdentificationNumber">Identification number</label>
+            </div>
+
+            <div class="textbox">
+                <input asp-for="PhoneNumber" type="text" placeholder=" "/>
+                <span asp-validation-for="PhoneNumber" class="field-validation-error"></span>
+                <label asp-for="PhoneNumber">Phone number</label>
+            </div>
+            
+            <div class="textbox">
                 <input asp-for="Email" type="email" placeholder=" "/>
                 <span asp-validation-for="Email" class="field-validation-error"></span>
-                <label asp-for="Email"></label>
+                <label asp-for="Email">Email</label>
             </div>
 
             <div class="textbox">
                 <input asp-for="Password" type="password" placeholder=" "/>
                 <span asp-validation-for="Password" class="field-validation-error"></span>
-                <label asp-for="Password"></label>
+                <label asp-for="Password">Password</label>
             </div>
 
             <div class="textbox">
                 <input asp-for="ConfirmPassword" type="password" placeholder=" "/>
                 <span asp-validation-for="ConfirmPassword" class="field-validation-error"></span>
-                <label asp-for="ConfirmPassword"></label>
+                <label asp-for="ConfirmPassword">Confirm password</label>
             </div>
 
             <button type="submit">Sign up</button>
         </form>
         <p>
-            Already have an account? <a>Sign in!</a>
+            Already have an account? <a href="@Url.Action("Login", "Account")">Sign in!</a>
         </p>
     </div>
+    @* Script for validation *@
+    <script>
+        $(document).ready(function () {
+            $.validator.addMethod("validIdentificationNumber", function (value, element) {
+                return /^[0-9A-Z]{14}$/.test(value);
+            }, "Identification number must contain exactly 14 characters (digits and capital letters).");
+
+            $.validator.addMethod("capitalized", function (value, element) {
+                return /^[A-ZА-ЯЁ][a-zа-яё]+$/.test(value);
+            }, "The first letter must be uppercase.");
+
+            $.validator.addMethod("validPhoneNumber", function (value, element) {
+                return /^\+[0-9]+$/.test(value);
+            }, "Phone number must start with + followed by digits.");
+
+            $("form").validate({
+                rules: {
+                    IdentificationNumber: {
+                        required: true,
+                        validIdentificationNumber: true
+                    },
+                    FirstName: {
+                        required: true,
+                        capitalized: true
+                    },
+                    LastName: {
+                        required: true,
+                        capitalized: true
+                    },
+                    Patronymic: {
+                        required: true,
+                        capitalized: true
+                    },
+                    PhoneNumber: {
+                        required: true,
+                        validPhoneNumber: true
+                    }
+                },
+                messages: {
+                    IdentificationNumber: {
+                        required: "Identification number is required."
+                    },
+                    FirstName: {
+                        required: "First name is required."
+                    },
+                    LastName: {
+                        required: "Last name is required."
+                    },
+                    Patronymic: {
+                        required: "Patronymic is required."
+                    },
+                    PhoneNumber: {
+                        required: "Phone number is required."
+                    }
+                }
+            });
+        });
+    </script>
 </body>

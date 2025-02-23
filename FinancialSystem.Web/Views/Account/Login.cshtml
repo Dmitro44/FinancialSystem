@@ -2,12 +2,15 @@
 
 @{
     ViewData["BodyClass"] = "login-page";
-    ViewData["Title"] = "Sign in";
+    ViewData["Title"] = "Sign In";
 }
 
 <head>
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true"/>
 </head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 <body class="login-page">
     <div class="login">
         <h2>Login</h2>
@@ -26,7 +29,7 @@
             <button type="submit">Sign In</button>
         </form>
         <p>
-            Don't have an acccount? <a>Sign up!</a>
+            Don't have an acccount? <a href="@Url.Action("Register", "Account")">Sign up!</a>
         </p>
     </div>
 </body>

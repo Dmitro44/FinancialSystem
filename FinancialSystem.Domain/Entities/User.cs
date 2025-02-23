@@ -9,8 +9,8 @@ public class User
     public string PassportNumber { get; private set; }
     public string PassportSeries { get; private set; }
     public string IdentificationNumber { get; private set; }
-    public string? PhoneNumber { get; private set; }
-    public string? Email { get; private set; }
+    public string PhoneNumber { get; private set; }
+    public string Email { get; private set; }
     public Role Role { get; private set; }
     
     // Add smth for foreign clients
