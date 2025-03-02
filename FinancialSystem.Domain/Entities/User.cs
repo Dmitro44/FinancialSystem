@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Identity;
+
 namespace FinancialSystem.Domain.Entities;
 
 public class User
@@ -11,17 +13,16 @@ public class User
     public string IdentificationNumber { get; private set; }
     public string PhoneNumber { get; private set; }
     public string Email { get; private set; }
-    public Role Role { get; private set; }
+    public string PasswordHash { get; private set; }
     
     // Add smth for foreign clients
-
-    public List<Bank> Banks { get; private set; } = new();
     
+    public List<UserBankRole> UserBankRoles { get; private set; } = new();
     public User() {}
 
     public User(string firstName, string lastName, string patronymic,
         string passportNumber, string passportSeries, string identificationNumber,
-        string phoneNumber, string email, Role role)
+        string phoneNumber, string email)
     {
         FirstName = firstName;
         LastName = lastName;
@@ -31,15 +32,22 @@ public class User
         IdentificationNumber = identificationNumber;
         PhoneNumber = phoneNumber;
         Email = email;
-        Role = role;
     }
-}
 
-public enum Role
-{
-    Client,
-    Operator,
-    Manager,
-    EnterpriseSpecialist,
-    Administrator
+    public void SetPassword(string userPassword)
+    {
+        PasswordHash = new PasswordHasher<User>().HashPassword(this, userPassword);
+    }
+
+    public bool VerifyPassword(string userPassword)
+    {
+        var result = new PasswordHasher<User>().VerifyHashedPassword(this, PasswordHash, userPassword);
+
+        if (result == PasswordVerificationResult.Success)
+        {
+            return true;
+        }
+
+        throw new ArgumentException("Invalid password");
+    }
 }

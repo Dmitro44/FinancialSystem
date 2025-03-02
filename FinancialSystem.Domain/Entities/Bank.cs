@@ -3,7 +3,7 @@ namespace FinancialSystem.Domain.Entities;
 public class Bank : BaseEnterprise
 {
     public string Bic { get; private set; }
-    public List<User> Users { get; private set; } = new();
+    public List<UserBankRole> UserBankRoles { get; private set; } = new();
     
     public List<Enterprise> Enterprises { get; private set; } = new();
     public List<Account> Accounts { get; private set; } = new();

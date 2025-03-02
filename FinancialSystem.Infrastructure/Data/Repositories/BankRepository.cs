@@ -46,4 +46,10 @@ public class BankRepository : IBankRepository
         _context.Banks.Remove(bank);
         await _context.SaveChangesAsync();
     }
+
+    public async Task AddUserToBankAsync(UserBankRole userBankRole)
+    {
+        await _context.UserBankRoles.AddAsync(userBankRole);
+        await _context.SaveChangesAsync();
+    }
 }

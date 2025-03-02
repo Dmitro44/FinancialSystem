@@ -1,4 +1,8 @@
+using FinancialSystem.Application.Configuration;
+using FinancialSystem.Application.Services;
+using FinancialSystem.Domain.Interfaces;
 using FinancialSystem.Infrastructure.Data;
+using FinancialSystem.Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace FinancialSystem.Web;
@@ -12,8 +16,19 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
-        builder.Services.AddDbContext<ApplicationDbContext>(options => 
-            options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+        builder.Services.AddScoped<JwtService>();
+        builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
+
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
+            options.LogTo(Console.WriteLine, LogLevel.Information)
+                .EnableSensitiveDataLogging()
+                .EnableDetailedErrors();
+        });
 
         var app = builder.Build();
 
