@@ -21,6 +21,7 @@ public class Program
 
         builder.Services.AddScoped<JwtService>();
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
+        builder.Services.AddAuth(builder.Configuration);
 
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
@@ -45,6 +46,7 @@ public class Program
 
         app.UseRouting();
 
+        app.UseAuthentication();
         app.UseAuthorization();
 
         app.MapControllerRoute(
