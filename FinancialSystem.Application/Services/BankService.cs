@@ -15,7 +15,7 @@ public class BankService
         _userRepository = userRepository;
     }
 
-    public async Task AssignUserToBank(UserBankDto dto)
+    public async Task RegisterUserToBankAsync(UserBankDto dto)
     {
         var user = await _userRepository.GetByIdAsync(dto.UserId);
         var bank = await _bankRepository.GetByIdAsync(dto.BankId);
@@ -34,8 +34,18 @@ public class BankService
         await _bankRepository.AddUserToBankAsync(userBankRole);
     }
 
-    public Bank CreateBank(BankDto dto)
+    public async Task<(List<UserBankRole>, List<Bank>)> GetUserBanksAsync(int userId)
     {
-        return new Bank(dto.Name, dto.Bic, dto.Address);
+        var user = await _userRepository.GetByIdWithRolesAsync(userId);
+        if (user == null)
+            throw new InvalidOperationException("User not found");
+
+        var registeredBanks = user.UserBankRoles.ToList();
+
+        var allBanks = await _bankRepository.GetAllBanksAsync();
+        
+        var otherBanks = allBanks.Where(b => registeredBanks.All(r => r.BankId != b.Id)).ToList();
+        
+        return (registeredBanks, otherBanks);
     }
 }

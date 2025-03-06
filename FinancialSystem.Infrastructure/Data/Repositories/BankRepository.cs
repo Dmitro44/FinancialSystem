@@ -52,4 +52,9 @@ public class BankRepository : IBankRepository
         await _context.UserBankRoles.AddAsync(userBankRole);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<Bank>> GetAllBanksAsync()
+    {
+        return await _context.Banks.ToListAsync();
+    }
 }

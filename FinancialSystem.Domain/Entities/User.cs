@@ -48,6 +48,6 @@ public class User
             return true;
         }
 
-        throw new ArgumentException("Invalid password");
+        return false;
     }
 }

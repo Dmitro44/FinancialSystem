@@ -1,16 +1,12 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Application.Services;
-using FinancialSystem.Domain.Interfaces;
-using FinancialSystem.Infrastructure.Data;
 using FinancialSystem.Web.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace FinancialSystem.Web.Controllers;
 
-public class AuthController : Controller
+public class AuthController : BaseController
 {
     private readonly UserService _userService;
 
@@ -54,10 +50,7 @@ public class AuthController : Controller
                 Password = model.Password
             };
 
-            var sw = Stopwatch.StartNew();
             await _userService.CreateUserAsync(userDto);
-            sw.Stop();
-            Console.WriteLine(sw.ElapsedMilliseconds);
         
             return RedirectToAction("Login", "Auth");
         }
@@ -71,18 +64,39 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<IActionResult> Login(LoginViewModel model)
     {
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        
         if (ModelState.IsValid)
         {
+            
             var token = await _userService.AuthenticateUserAsync(model.Email, model.Password);
 
             if (token == null)
             {
-                ModelState.AddModelError("", "Invalid login attempt");
+                ModelState.AddModelError("","Invalid login or password");
+                return View(model);
             }
-            return Ok(token);
-            // return RedirectToAction("Index", "Home");
+            
+            Response.Cookies.Append("AuthToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict
+            });
+        
+            return RedirectToAction("Banks", "Bank");
+            
         }
         
         return View(model);
+    }
+
+    public IActionResult Logout()
+    {
+        Response.Cookies.Delete("AuthToken");
+        return RedirectToAction("Login", "Auth");
     }
 }

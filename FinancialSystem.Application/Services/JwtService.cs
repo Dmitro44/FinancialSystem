@@ -14,7 +14,9 @@ public class JwtService(IOptions<AuthSettings> authSettings)
     {
         var claims = new List<Claim>()
         {
-            new Claim("id", user.Id.ToString()),
+            new Claim("UserId", user.Id.ToString()),
+            new Claim("LastName", user.LastName),
+            new Claim("FirstName", user.FirstName),
             new Claim("email", user.Email),
         };
 

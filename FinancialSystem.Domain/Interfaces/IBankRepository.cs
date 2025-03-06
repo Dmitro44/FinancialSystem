@@ -9,4 +9,5 @@ public interface IBankRepository
     Task UpdateAsync(Bank bank);
     Task DeleteAsync(int bankId);
     Task AddUserToBankAsync(UserBankRole userBankRole);
+    Task<List<Bank>> GetAllBanksAsync();
 }

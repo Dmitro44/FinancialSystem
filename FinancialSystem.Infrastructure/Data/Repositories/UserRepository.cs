@@ -26,11 +26,15 @@ public class UserRepository : IUserRepository
 
     public async Task<bool> IsUserExists(string userIdentificationNumber)
     {
-        var sw = Stopwatch.StartNew();
-        var result = await _context.Users.AsNoTracking().AnyAsync(x => x.IdentificationNumber == userIdentificationNumber);
-        sw.Stop();
-        Console.WriteLine($"EF Core took: {sw.ElapsedMilliseconds} ms");
-        return result;
+        return await _context.Users.AsNoTracking().AnyAsync(x => x.IdentificationNumber == userIdentificationNumber);
+    }
+
+    public async Task<User?> GetByIdWithRolesAsync(int userId)
+    {
+        return await _context.Users
+            .Include(u => u.UserBankRoles)
+            .ThenInclude(ubr => ubr.Bank)
+            .FirstOrDefaultAsync(u => u.Id == userId);
     }
 
     public async Task AddAsync(User user)

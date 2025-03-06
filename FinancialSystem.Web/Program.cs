@@ -18,6 +18,8 @@ public class Program
 
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<BankService>();
+        builder.Services.AddScoped<IBankRepository, BankRepository>();
 
         builder.Services.AddScoped<JwtService>();
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
@@ -26,12 +28,15 @@ public class Program
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
             options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
-            options.LogTo(Console.WriteLine, LogLevel.Information)
-                .EnableSensitiveDataLogging()
-                .EnableDetailedErrors();
         });
 
         var app = builder.Build();
+        
+        using (var scope = app.Services.CreateScope())
+        {
+            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            _ = context.Banks.FirstOrDefault(); // Simple request for warmup
+        }
 
         // Configure the HTTP request pipeline.
         if (!app.Environment.IsDevelopment())

@@ -12,24 +12,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 <body class="login-page">
-    <div class="login">
-        <h2>Login</h2>
-        <form class="form" asp-action="Login" method="post">
-            <div class="textbox">
-                <input asp-for="Email" type="email" placeholder=" "/>
-                <span asp-validation-for="Email" class="field-validation-error"></span>
-                <label asp-for="Email"></label>
+<div class="login">
+    <h2>Login</h2>
+    <form class="form" asp-action="Login" method="post">
+        <input type="hidden" name="jwtToken" value="@ViewBag.JwtToken"/>
+        <div class="textbox">
+            <input asp-for="Email" type="email" placeholder=" "/>
+            <span asp-validation-for="Email" class="field-validation-error"></span>
+            <label asp-for="Email"></label>
+        </div>
+        <div class="textbox">
+            <input asp-for="Password" type="password" placeholder=" "/>
+            <span asp-validation-for="Password" class="field-validation-error"></span>
+            <label asp-for="Password"></label>
+        </div>
+        
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger" role="alert">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    @error.ErrorMessage
+                }
             </div>
-            <div class="textbox">
-                <input asp-for="Password" type="password" placeholder=" "/>
-                <span asp-validation-for="Password" class="field-validation-error"></span>
-                <label asp-for="Password"></label>
-            </div>
-            
-            <button type="submit">Sign In</button>
-        </form>
-        <p>
-            Don't have an acccount? <a href="@Url.Action("Register", "Auth")">Sign up!</a>
-        </p>
-    </div>
+        }
+
+        <button type="submit">Sign In</button>
+    </form>
+    <p>
+        Don't have an acccount? <a href="@Url.Action("Register", "Auth")">Sign up!</a>
+    </p>
+</div>
 </body>

@@ -73,6 +73,16 @@
                 <label asp-for="ConfirmPassword">Confirm password</label>
             </div>
 
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger" role="alert">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        @error.ErrorMessage
+                    }
+                </div>
+            }
+            
             <button type="submit">Sign up</button>
         </form>
         <p>

@@ -25,12 +25,32 @@
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Register">Sign Up</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">Sign In</a>
-                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    @if (User.Identity?.IsAuthenticated ?? false)
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                @($"{User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value} {User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value}")
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Profile</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bank" asp-action="Banks">My Banks</a></li>
+                                <li><hr class="dropdown-divider"/></li>
+                                <li><a class="dropdown-item text-danger" asp-controller="Auth" asp-action="Logout">Sign out</a></li>
+                            </ul>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Register">Sign Up</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Login">Sign In</a>
+                        </li>
+                    }
                 </ul>
             </div>
         </div>
