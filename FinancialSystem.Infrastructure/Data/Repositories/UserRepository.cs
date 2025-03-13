@@ -55,7 +55,16 @@ public class UserRepository : IUserRepository
             throw new ArgumentNullException(nameof(user));
         }
         
-        _context.Users.Update(userToUpdate);
+        userToUpdate.UpdateDetails(
+            user.FirstName,
+            user.LastName,
+            user.Patronymic,
+            user.PassportNumber,
+            user.PassportSeries,
+            user.IdentificationNumber,
+            user.PhoneNumber,
+            user.Email);
+        
         await _context.SaveChangesAsync();
     }
 

@@ -87,7 +87,7 @@ public class AuthController : BaseController
                 SameSite = SameSiteMode.Strict
             });
         
-            return RedirectToAction("Banks", "Bank");
+            return RedirectToAction("GetBanks", "Bank");
             
         }
         

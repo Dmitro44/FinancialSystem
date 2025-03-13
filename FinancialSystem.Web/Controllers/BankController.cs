@@ -42,22 +42,66 @@ public class BankController : BaseController
         
         await _bankService.RegisterUserToBankAsync(userBankDto);
 
-        return RedirectToAction("Banks", "Bank");
+        return RedirectToAction("GetBanks", "Bank");
     }
 
     [HttpGet]
-    [ActionName("Banks")]
+    [Route("User/Banks")]
     public async Task<IActionResult> GetBanks()
     {
         var userId = GetCurrentUserId();
         var (registeredBanks, otherBanks) = await _bankService.GetUserBanksAsync(userId);
 
-        var model = new BanksViewModel
+        var model = new UserBanksViewModel
         {
             RegisteredBanks = registeredBanks,
             OtherBanks = otherBanks
         };
 
-        return View("~/Views/User/Banks.cshtml",model);
+        return View("~/Views/User/Banks.cshtml", model);
+    }
+
+    [HttpGet("Details/{bankId}")]
+    public async Task<IActionResult> GetBankDetails(int bankId)
+    {
+        var currentUserId = GetCurrentUserId();
+        
+        var bank = await _bankService.GetBankByIdAsync(bankId);
+
+        if (bank == null)
+        {
+            return NotFound("Bank not found");
+        }
+        
+        var userAccounts = await _bankService.GetAccountsForUserAsync(currentUserId);
+        var userLoans = await _bankService.GetLoansForUserAsync(currentUserId);
+        var userInstallments = await _bankService.GetInstallmentsForUserAsync(currentUserId);
+        
+        var model = new BankViewModel
+        {
+            BankName = bank.Name,
+            Bic = bank.Bic,
+            Adress = bank.Address,
+            Accounts = userAccounts.ToList(),
+            Loans = userLoans.ToList(),
+            Installments = userInstallments.ToList()
+        };
+            
+        return View("~/Views/Bank/Index.cshtml", model);
+    }
+
+    public async Task<IActionResult> CreateAccount(AccountViewModel model)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IActionResult> CreateLoan()
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<IActionResult> CreateInstallment()
+    {
+        throw new NotImplementedException();
     }
 }

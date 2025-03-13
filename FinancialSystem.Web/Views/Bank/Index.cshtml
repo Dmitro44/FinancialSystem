@@ -1,0 +1,139 @@
+@model BankViewModel
+
+@{
+    ViewData["Title"] = "My finances in " + @Model.BankName;
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Bank: @Model.BankName</h2>
+
+    <div class="accordion" id="bankDataAccordion">
+
+        <!-- ACCOUNTS -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accountsHeading">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accountsCollapse">
+                    💰 My accounts (@Model.Accounts.Count)
+                </button>
+                <a href="#" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#newAccountModal">
+                    ➕ New Account
+                </a>
+            </h2>
+            <div id="accountsCollapse" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    @if (Model.Accounts.Any())
+                    {
+                        <div class="row">
+                            @foreach (var account in Model.Accounts)
+                            {
+                                <div class="col-md-4">
+                                    <div class="card mb-3 border-primary">
+                                        <div class="card-body">
+                                            <h5 class="card-title">№ @account.Id</h5>
+                                            <p class="card-text">Balance: <strong>@account.Balance ₽</strong></p>
+                                            <p class="card-text"><small class="text-muted">Type: @account.Owner.LastName</small></p>
+                                            <a href="@Url.Action("AccountDetails", "Bank", new { id = account.Id })" class="btn btn-primary">Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>You don't have any accounts with this bank.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- LOANS -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="loansHeading">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#loansCollapse">
+                    🏦 My loans (@Model.Loans.Count)
+                </button>
+                <a href="@Url.Action("CreateLoan", "Bank")" class="btn btn-outline-warning ms-2">➕ New Loan</a>
+            </h2>
+            <div id="loansCollapse" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    @if (Model.Loans.Any())
+                    {
+                        <div class="row">
+                            @foreach (var loan in Model.Loans)
+                            {
+                                <div class="col-md-4">
+                                    <div class="card mb-3 border-warning">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Loan № @loan.Id</h5>
+                                            <p class="card-text">Amount: <strong>@loan.Amount ₽</strong></p>
+                                            <p class="card-text"><small class="text-muted">Ставка: @loan.InterestRate%</small></p>
+                                            <a href="@Url.Action("LoanDetails", "Bank", new { id = loan.Id })" class="btn btn-warning">Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>You don't have active loans.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- INSTALLMENTS -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="installmentsHeading">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#installmentsCollapse">
+                    📆 My installments (@Model.Installments.Count)
+                </button>
+                <a href="@Url.Action("CreateInstallment", "Bank")" class="btn btn-outline-warning ms-2">➕ New Installment</a>
+            </h2>
+            <div id="installmentsCollapse" class="accordion-collapse collapse">
+                <div class="accordion-body">
+                    @if (Model.Installments.Any())
+                    {
+                        <div class="row">
+                            @foreach (var installment in Model.Installments)
+                            {
+                                <div class="col-md-4">
+                                    <div class="card mb-3 border-success">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Installment № @installment.Id</h5>
+                                            <p class="card-text">Amount: <strong>@installment.Amount ₽</strong></p>
+                                            <p class="card-text">Remain to pay: <strong>@installment.MonthlyPayment ₽</strong></p>
+                                            <p class="card-text"><small class="text-muted">Term: @installment.TermInMonths months</small></p>
+                                            <a href="@Url.Action("InstallmentDetails", "Bank", new { id = installment.Id })" class="btn btn-success">Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>You don't have active installments.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@* Modal window for new account *@
+<div class="modal fade" id="newAccountModal" tabindex="-1" aria-labelledby="newAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newAccountModalLabel">Create New Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("_CreateAccount", new AccountViewModel())
+            </div>
+        </div>
+    </div>
+</div>

@@ -38,4 +38,9 @@ public class AccountService
         
         return account;
     }
+
+    public async Task<IEnumerable<Account>> GetAccountsByUserIdAsync(int userId)
+    {
+        return await _accountRepository.GetAccountsByUserIdAsync(userId);
+    }
 }

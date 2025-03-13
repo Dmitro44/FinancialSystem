@@ -1,0 +1,21 @@
+@model ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="container mt-4">
+    <div class="card shadow-lg">
+        <div class="card-header bg-success text-white">
+            <h2>User profile</h2>
+        </div>
+        <div class="card-body">
+            <h4>@Model.LastName @Model.FirstName @Model.Patronymic</h4>
+            <p><strong>Email: @Model.Email</strong></p>
+            <p><strong>Phone number: @Model.PhoneNumber</strong></p>
+        </div>
+        <div class="card-footer text-center">
+            <a asp-controller="User" asp-action="EditProfile" class="btn btn-warning">Edit profile</a>
+        </div>
+    </div>
+</div>

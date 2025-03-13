@@ -1,5 +1,7 @@
+using FinancialSystem.Application.DTOs;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace FinancialSystem.Infrastructure.Data.Repositories;
 
@@ -20,6 +22,7 @@ public class LoanRepository : ILoanRepository
     public async Task AddAsync(Loan loan)
     {
         await _context.Loans.AddAsync(loan);
+        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Loan loan)
@@ -30,7 +33,14 @@ public class LoanRepository : ILoanRepository
             throw new ArgumentNullException(nameof(loanToUpdate));
         }
         
-        _context.Loans.Update(loanToUpdate);
+        loanToUpdate.UpdateDetails(
+            loan.Amount,
+            loan.TermInMonths,
+            loan.InterestRate,
+            loan.TotalAmount,
+            loan.MonthlyPayment,
+            loan.StartDate);
+
         await _context.SaveChangesAsync();
     }
 
@@ -43,5 +53,13 @@ public class LoanRepository : ILoanRepository
         }
 
         _context.Loans.Remove(loanToDelete);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Loan>> GetLoansByUserIdAsync(int userId)
+    {
+        return await _context.Loans
+            .Where(loan => loan.BorrowerId == userId)
+            .ToListAsync();
     }
 }

@@ -4,7 +4,9 @@ public class Loan
 {
     public int Id { get; private set; }
     public User Borrower { get; private set; }
+    public int BorrowerId { get; private set; }
     public Bank Bank { get; private set; }
+    public int BankId { get; private set; }
     public decimal Amount { get; private set; }
     public int TermInMonths { get; private set; }
     public decimal InterestRate { get; private set; }
@@ -18,9 +20,23 @@ public class Loan
         decimal monthlyPayment, DateTime startDate)
     {
         Borrower = borrower;
+        BorrowerId = borrower.Id;
         Bank = bank;
+        BankId = bank.Id;
         Amount = amount;
         TermInMonths = termMonths;
+        InterestRate = interestRate;
+        TotalAmount = totalAmount;
+        MonthlyPayment = monthlyPayment;
+        StartDate = startDate;
+    }
+
+    public void UpdateDetails(decimal amount, int termInMonths,
+        decimal interestRate, decimal totalAmount, 
+        decimal monthlyPayment, DateTime startDate)
+    {
+        Amount = amount;
+        TermInMonths = termInMonths;
         InterestRate = interestRate;
         TotalAmount = totalAmount;
         MonthlyPayment = monthlyPayment;

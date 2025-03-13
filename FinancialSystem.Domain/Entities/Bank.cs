@@ -17,4 +17,10 @@ public class Bank : BaseEnterprise
     {
         Bic = bic;
     }
+
+    public void UpdateDetails(string name, string bic, string address)
+    {
+        Bic = bic;
+        base.UpdateDetails(name, address);
+    }
 }

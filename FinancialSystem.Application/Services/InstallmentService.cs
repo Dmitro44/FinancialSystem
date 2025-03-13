@@ -9,6 +9,7 @@ public class InstallmentService
     private readonly IFinancialCalculator _calculator;
     private readonly IUserRepository _userRepository;
     private readonly IBankRepository _bankRepository;
+    private readonly IInstallmentRepository _installmentRepository;
 
     public InstallmentService(IFinancialCalculator calculator, IUserRepository userRepository,
         IBankRepository bankRepository)
@@ -35,7 +36,10 @@ public class InstallmentService
         }
         
         return new Installment(payer, bank, dto.Amount, dto.TermInMonths, dto.InterestRate, monthlyPayment, dto.StartDate);
-        
-        
+    }
+
+    public async Task<IEnumerable<Installment>> GetInstallmentsByUserIdAsync(int userId)
+    {
+        return await _installmentRepository.GetInstallmentsByUserIdAsync(userId);
     }
 }

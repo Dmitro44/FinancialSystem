@@ -18,4 +18,9 @@ public class Account
         Bank = bank;
         BankId = bank.Id;
     }
+
+    public void UpdateDetails(decimal balance)
+    {
+        Balance = balance;
+    }
 }

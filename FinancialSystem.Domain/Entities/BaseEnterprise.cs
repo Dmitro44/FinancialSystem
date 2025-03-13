@@ -12,4 +12,10 @@ public class BaseEnterprise
         Name = name;
         Address = address;
     }
+
+    protected void UpdateDetails(string name, string address)
+    {
+        Name = name;
+        Address = address;
+    }
 }

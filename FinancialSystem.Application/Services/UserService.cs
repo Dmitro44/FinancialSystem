@@ -42,4 +42,9 @@ public class UserService
 
         return _jwtService.GenerateToken(user);
     }
+
+    public async Task<User?> GetUserAsync(int userId)
+    {
+        return await _userRepository.GetByIdAsync(userId);
+    } 
 }

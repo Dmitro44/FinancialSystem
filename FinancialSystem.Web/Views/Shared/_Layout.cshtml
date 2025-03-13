@@ -35,8 +35,8 @@
                                 @($"{User.Claims.FirstOrDefault(c => c.Type == "LastName")?.Value} {User.Claims.FirstOrDefault(c => c.Type == "FirstName")?.Value}")
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Profile</a></li>
-                                <li><a class="dropdown-item" asp-controller="Bank" asp-action="Banks">My Banks</a></li>
+                                <li><a class="dropdown-item" asp-controller="User" asp-action="Profile">Profile</a></li>
+                                <li><a class="dropdown-item" asp-controller="Bank" asp-action="GetBanks">My Banks</a></li>
                                 <li><hr class="dropdown-divider"/></li>
                                 <li><a class="dropdown-item text-danger" asp-controller="Auth" asp-action="Logout">Sign out</a></li>
                             </ul>

@@ -43,4 +43,9 @@ public class LoanService
 
         return loan;
     }
+
+    public async Task<IEnumerable<Loan>> GetLoansByUserIdAsync(int userId)
+    {
+        return await _loanRepository.GetLoansByUserIdAsync(userId);
+    }
 }

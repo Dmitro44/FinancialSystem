@@ -34,6 +34,20 @@ public class User
         Email = email;
     }
 
+    public void UpdateDetails(string firstName, string lastName, string patronymic,
+        string passportNumber, string passportSeries, string identificationNumber,
+        string phoneNumber, string email)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Patronymic = patronymic;
+        PassportNumber = passportNumber;
+        PassportSeries = passportSeries;
+        IdentificationNumber = identificationNumber;
+        PhoneNumber = phoneNumber;
+        Email = email;
+    }
+
     public void SetPassword(string userPassword)
     {
         PasswordHash = new PasswordHasher<User>().HashPassword(this, userPassword);

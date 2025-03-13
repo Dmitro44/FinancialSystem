@@ -8,4 +8,5 @@ public interface ILoanRepository
     Task AddAsync(Loan loan);
     Task UpdateAsync(Loan loan);
     Task DeleteAsync(int loanId);
+    Task<IEnumerable<Loan>> GetLoansByUserIdAsync(int userId);
 }

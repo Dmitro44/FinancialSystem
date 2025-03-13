@@ -32,7 +32,8 @@ public class AccountRepository : IAccountRepository
             throw new ArgumentNullException(nameof(account));
         }
         
-        _context.Accounts.Update(accountToUpdate);
+        accountToUpdate.UpdateDetails(account.Balance);
+        
         await _context.SaveChangesAsync();
     }
 
@@ -46,5 +47,12 @@ public class AccountRepository : IAccountRepository
         
         _context.Accounts.Remove(accountToDelete);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Account>> GetAccountsByUserIdAsync(int userId)
+    {
+        return await _context.Accounts
+            .Where(account => account.OwnerId == userId)
+            .ToListAsync();
     }
 }

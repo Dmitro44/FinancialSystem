@@ -32,7 +32,11 @@ public class BankRepository : IBankRepository
             throw new ArgumentNullException(nameof(bank));
         }
 
-        _context.Banks.Update(bankToUpdate);
+        bankToUpdate.UpdateDetails(
+            bank.Name, 
+            bank.Bic, 
+            bank.Address);
+        
         await _context.SaveChangesAsync();
     }
 
