@@ -8,5 +8,5 @@ public interface IAccountRepository
     Task AddAsync(Account account);
     Task UpdateAsync(Account account);
     Task DeleteAsync(int accountId);
-    Task<IEnumerable<Account>> GetAccountsByUserIdAsync(int userId);
+    Task<IEnumerable<Account>> GetUserAccountsByBankAsync(int userId, int bankId);
 }

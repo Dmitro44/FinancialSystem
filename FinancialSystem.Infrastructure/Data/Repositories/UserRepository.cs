@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -78,5 +77,13 @@ public class UserRepository : IUserRepository
         
         _context.Users.Remove(userToDelete);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<Role?> GetRoleInBankAsync(int userId, int bankId)
+    {
+        var userBankRole = await _context.UserBankRoles
+            .FirstOrDefaultAsync(ubr => ubr.UserId == userId && ubr.BankId == bankId);
+        
+        return userBankRole?.Role;
     }
 }

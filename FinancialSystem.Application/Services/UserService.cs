@@ -46,5 +46,17 @@ public class UserService
     public async Task<User?> GetUserAsync(int userId)
     {
         return await _userRepository.GetByIdAsync(userId);
-    } 
+    }
+
+    public async Task<Role?> GetRoleInBankAsync(int userId, int bankId)
+    {
+        var role = await _userRepository.GetRoleInBankAsync(userId, bankId);
+
+        if (role == null)
+        {
+            throw new InvalidOperationException("User has no role in this bank");
+        }
+
+        return role;
+    }
 }

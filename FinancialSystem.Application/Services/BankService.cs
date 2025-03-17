@@ -63,19 +63,24 @@ public class BankService
         return await _bankRepository.GetByIdAsync(bankId);
     }
 
-    public async Task<IEnumerable<Account>> GetAccountsForUserAsync(int userId)
+    public async Task<IEnumerable<Account>> RetrieveUserAccountsByBankAsync(int userId, int bankId)
     {
-        return await _accountService.GetAccountsByUserIdAsync(userId);
+        return await _accountService.FetchUserAccountsByBankAsync(userId, bankId);
     }
 
-    public async Task<IEnumerable<Loan>> GetLoansForUserAsync(int userId)
+    public async Task<IEnumerable<Loan>> RetrieveUserLoansByBankAsync(int userId, int bankId)
     {
-        return await _loanService.GetLoansByUserIdAsync(userId);
+        return await _loanService.FetchUserLoansByBankAsync(userId, bankId);
     }
 
-    public async Task<IEnumerable<Installment>> GetInstallmentsForUserAsync(int userId)
+    public async Task<IEnumerable<Installment>> RetrieveUserInstallmentsByBankAsync(int userId, int bankId)
     {
-        return await _installmentService.GetInstallmentsByUserIdAsync(userId);
+        return await _installmentService.FetchUserInstallmentsByBankAsync(userId, bankId);
+    }
+
+    public async Task<IEnumerable<Loan>> RetrieveLoansByBankAsync(int bankId)
+    {
+        return await _loanService.FetchLoansByBankAsync(bankId);
     }
 
     public async Task CreateAccountAsync(AccountDto dto)

@@ -20,11 +20,11 @@ public class AccountService
 
     public async Task<Account> CreateAccountAsync(AccountDto dto)
     {
-        var user = await _userRepository.GetByIdAsync(dto.UserId);
+        var user = await _userRepository.GetByIdAsync(dto.OwnerId);
         var bank = await _bankRepository.GetByIdAsync(dto.BankId);
         if (user == null)
         {
-            throw new ApplicationException($"User with id: {dto.UserId} does not exist.");
+            throw new ApplicationException($"User with id: {dto.OwnerId} does not exist.");
         }
 
         if (bank == null)
@@ -39,8 +39,8 @@ public class AccountService
         return account;
     }
 
-    public async Task<IEnumerable<Account>> GetAccountsByUserIdAsync(int userId)
+    public async Task<IEnumerable<Account>> FetchUserAccountsByBankAsync(int userId, int bankId)
     {
-        return await _accountRepository.GetAccountsByUserIdAsync(userId);
+        return await _accountRepository.GetUserAccountsByBankAsync(userId, bankId);
     }
 }

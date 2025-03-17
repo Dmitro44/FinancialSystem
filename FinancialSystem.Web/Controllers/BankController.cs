@@ -2,6 +2,8 @@ using FinancialSystem.Application.DTOs;
 using FinancialSystem.Application.Services;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Web.Models;
+using FinancialSystem.Web.Models.Client;
+using FinancialSystem.Web.Models.Manager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +13,12 @@ namespace FinancialSystem.Web.Controllers;
 public class BankController : BaseController
 {
     private readonly BankService _bankService;
+    private readonly UserService _userService;
 
-    public BankController(BankService bankService)
+    public BankController(BankService bankService, UserService userService)
     {
         _bankService = bankService;
+        _userService = userService;
     }
 
     [HttpPost]
@@ -72,36 +76,45 @@ public class BankController : BaseController
         {
             return NotFound("Bank not found");
         }
+
+        var role = await _userService.GetRoleInBankAsync(currentUserId, bankId);
         
-        var userAccounts = await _bankService.GetAccountsForUserAsync(currentUserId);
-        var userLoans = await _bankService.GetLoansForUserAsync(currentUserId);
-        var userInstallments = await _bankService.GetInstallmentsForUserAsync(currentUserId);
-        
-        var model = new BankViewModel
+        if (role == Role.Client)
         {
-            BankName = bank.Name,
-            Bic = bank.Bic,
-            Adress = bank.Address,
-            Accounts = userAccounts.ToList(),
-            Loans = userLoans.ToList(),
-            Installments = userInstallments.ToList()
-        };
+            var userAccounts = await _bankService.RetrieveUserAccountsByBankAsync(currentUserId, bankId);
+            var userLoans = await _bankService.RetrieveUserLoansByBankAsync(currentUserId, bankId);
+            var userInstallments = await _bankService.RetrieveUserInstallmentsByBankAsync(currentUserId, bankId);
+
+            ViewBag.BankId = bankId;
+        
+            var model = new ClientBankViewModel
+            {
+                BankId = bankId,
+                BankName = bank.Name,
+                Bic = bank.Bic,
+                Address = bank.Address,
+                Accounts = userAccounts.ToList(),
+                Loans = userLoans.ToList(),
+                Installments = userInstallments.ToList()
+            };
             
-        return View("~/Views/Bank/Index.cshtml", model);
-    }
+            return View("Client/Index", model);
+        }
 
-    public async Task<IActionResult> CreateAccount(AccountViewModel model)
-    {
-        throw new NotImplementedException();
-    }
+        if (role == Role.Manager)
+        {
+            var loanRequests = await _bankService.RetrieveLoansByBankAsync(bankId);
 
-    public async Task<IActionResult> CreateLoan()
-    {
-        throw new NotImplementedException();
-    }
+            var model = new ManagerBankViewModel
+            {
+                BankId = bankId,
+                BankName = bank.Name,
+                LoanRequests = loanRequests.ToList()
+            };
+            
+            return View("Manager/Index", model);
+        }
 
-    public async Task<IActionResult> CreateInstallment()
-    {
-        throw new NotImplementedException();
+        return Forbid();
     }
 }

@@ -24,12 +24,12 @@ public class Program
         
         builder.Services.AddScoped<AccountService>();
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
-        builder.Services.AddScoped<IFinancialCalculator, FinancialCalculator>();
         
         builder.Services.AddScoped<LoanService>();
         builder.Services.AddScoped<ILoanRepository, LoanRepository>();
         
         builder.Services.AddScoped<InstallmentService>();
+        builder.Services.AddScoped<IInstallmentRepository, InstallmentRepository>();
 
         builder.Services.AddScoped<JwtService>();
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));

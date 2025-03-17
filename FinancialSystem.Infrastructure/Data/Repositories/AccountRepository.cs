@@ -49,10 +49,11 @@ public class AccountRepository : IAccountRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Account>> GetAccountsByUserIdAsync(int userId)
+    public async Task<IEnumerable<Account>> GetUserAccountsByBankAsync(int userId, int bankId)
     {
         return await _context.Accounts
-            .Where(account => account.OwnerId == userId)
+            .Include(a => a.Owner)
+            .Where(account => account.OwnerId == userId && account.BankId == bankId)
             .ToListAsync();
     }
 }

@@ -1,0 +1,90 @@
+@model LoanViewModel
+
+<form id="newLoanForm" asp-action="CreateLoan" asp-controller="Client" method="post">
+    <input type="hidden" id="BankId" name="BankId" value="@ViewBag.BankId"/>
+    
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label">Loan Amount</label>
+        <input type="number" asp-for="Amount" class="form-control" required onchange="calculateTotalAmount()"/>
+    </div>
+    <div class="mb-3">
+        <label asp-for="TermInMonths" class="form-label">Loan Term</label>
+        <select asp-for="TermInMonths" class="form-select" onchange="toggleCustomTerm(this)">
+            <option value="3" selected>3 months</option>
+            <option value="6">6 months</option>
+            <option value="12">12 months</option>
+            <option value="24">24 months</option>
+            <option value="36">More than 24 months (custom)</option>
+        </select>
+    </div>
+    
+    <!-- Поле для ввода пользовательского срока -->
+    <div class="mb-3" id="customTermDiv" style="display:none;">
+        <label for="CustomTerm" class="form-label">Custom term (months)</label>
+        <input type="number" class="form-control" id="CustomTerm" name="CustomTerm" min="25" onchange="calculateTotalAmount()" />
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="InterestRate" class="form-label">Interest rate (%)</label>
+        <input asp-for="InterestRate" type="number" step="0.01" class="form-control" readonly />
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="TotalAmount" class="form-label">Total payment</label>
+        <input asp-for="TotalAmount" type="number" class="form-control" readonly/>
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="MonthlyPayment" class="form-label">Monthly payment</label>
+        <input asp-for="MonthlyPayment" type="number" class="form-control" readonly/>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create loan request</button>
+</form>
+
+<script>
+    // Функция для переключения поля ввода пользовательского срока
+    function toggleCustomTerm(selectElement) {
+        var customTermDiv = document.getElementById('customTermDiv');
+        var termInMonths = selectElement.value;
+
+        if (termInMonths > 24) {
+            customTermDiv.style.display = 'block';
+        } else {
+            customTermDiv.style.display = 'none';
+            calculateTotalAmount(); // пересчитываем общую сумму при изменении срока
+        }
+    }
+
+    function calculateTotalAmount() {
+        const amount = parseFloat(document.getElementById('Amount').value);
+        let termInMonths = parseInt(document.getElementById('TermInMonths').value);
+
+        if (termInMonths > 24) {
+            termInMonths = parseInt(document.getElementById('CustomTerm').value);
+        }
+
+        if (!amount || !termInMonths) {
+            document.getElementById('TotalPayment').value = '';
+            document.getElementById('InterestRate').value = '';
+            return;
+        }
+
+        fetch('/Loan/CalculateTotalAmount', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount, termInMonths })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('InterestRate').value = data.interestRate.toFixed(2);
+            document.getElementById('TotalAmount').value = data.totalAmount.toFixed(2);
+            document.getElementById('MonthlyPayment').value = data.monthlyPayment;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    window.onload = function() {
+        toggleCustomTerm(document.getElementById('TermInMonths'));
+    };
+</script>

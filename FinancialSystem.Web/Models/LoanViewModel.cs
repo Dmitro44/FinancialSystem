@@ -1,12 +1,11 @@
-namespace FinancialSystem.Application.DTOs;
+namespace FinancialSystem.Web.Models;
 
-public class LoanDto
+public class LoanViewModel
 {
-    public int UserId { get; set; }
     public int BankId { get; set; }
     public decimal Amount { get; set; }
-    public int TermInMonths { get; set; }
     public decimal InterestRate { get; set; }
+    public int TermInMonths { get; set; }
     public decimal TotalAmount { get; set; }
     public decimal MonthlyPayment { get; set; }
 }

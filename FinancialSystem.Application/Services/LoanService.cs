@@ -1,20 +1,19 @@
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Interfaces;
+using Microsoft.VisualBasic;
 
 namespace FinancialSystem.Application.Services;
 
 public class LoanService
 {
-    private readonly IFinancialCalculator _calculator;
     private readonly ILoanRepository _loanRepository;
     private readonly IUserRepository _userRepository;
     private readonly IBankRepository _bankRepository;
 
-    public LoanService(IFinancialCalculator calculator, IUserRepository userRepository,
-        IBankRepository bankRepository, ILoanRepository loanRepository)
+    public LoanService(IUserRepository userRepository, IBankRepository bankRepository,
+        ILoanRepository loanRepository)
     {
-        _calculator = calculator;
         _userRepository = userRepository;
         _bankRepository = bankRepository;
         _loanRepository = loanRepository;
@@ -22,30 +21,44 @@ public class LoanService
 
     public async Task<Loan> CreateLoanAsync(LoanDto dto)
     {
-        var totalAmount = _calculator.CalculateTotalAmount(dto.Amount, dto.InterestRate);
-        var monthlyPayment = _calculator.CalculateMonthlyPayment(dto.Amount, dto.TermInMonths);
-
-        var bank = await _bankRepository.GetByIdAsync(dto.BankId);
-        var borrower = await _userRepository.GetByIdAsync(dto.UserId);
-        if (borrower == null)
-        {
-            throw new ApplicationException($"User with id: {dto.UserId} does not exist.");
-        }
-
-        if (bank == null)
-        {
-            throw new ApplicationException($"Bank with id: {dto.BankId} does not exist.");
-        }
+        var bank = await _bankRepository.GetByIdAsync(dto.BankId)
+            ?? throw new ApplicationException($"Bank with id: {dto.BankId} does not exist.");
+            
+        var borrower = await _userRepository.GetByIdAsync(dto.UserId)
+            ?? throw new ApplicationException($"User with id: {dto.UserId} does not exist.");
         
-        var loan = new Loan(borrower, bank, dto.Amount, dto.TermInMonths, dto.InterestRate, totalAmount, monthlyPayment, dto.StartDate);
+        var loan = new Loan(borrower, bank, dto.Amount, dto.TermInMonths, dto.InterestRate, dto.TotalAmount, dto.MonthlyPayment);
         
         await _loanRepository.AddAsync(loan);
 
         return loan;
     }
 
-    public async Task<IEnumerable<Loan>> GetLoansByUserIdAsync(int userId)
+    public async Task<IEnumerable<Loan>> FetchUserLoansByBankAsync(int userId, int bankId)
     {
-        return await _loanRepository.GetLoansByUserIdAsync(userId);
+        return await _loanRepository.GetUserLoansByBankAsync(userId, bankId);
+    }
+
+    public async Task<IEnumerable<Loan>> FetchLoansByBankAsync(int bankId)
+    {
+        return await _loanRepository.GetLoansByBankAsync(bankId);
+    }
+
+    public async Task<Loan?> GetLoanByIdAsync(int loanId)
+    {
+        var loan = await _loanRepository.GetByIdAsync(loanId)
+            ?? throw new InvalidOperationException($"Loan with id: {loanId} does not exist.");
+
+        return loan;
+    }
+
+    public async Task UpdateLoanAsync(Loan loan)
+    {
+        await _loanRepository.UpdateAsync(loan);
+    }
+
+    public async Task UpdateStatusAsync(int loanId, LoanStatus newStatus)
+    {
+        await _loanRepository.UpdateStatusAsync(loanId, newStatus);
     }
 }

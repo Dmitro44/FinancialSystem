@@ -8,5 +8,5 @@ public interface IInstallmentRepository
     Task AddAsync(Installment installment);
     Task UpdateAsync(Installment installment);
     Task DeleteAsync(int installmentId);
-    Task<IEnumerable<Installment>> GetInstallmentsByUserIdAsync(int userId);
+    Task<IEnumerable<Installment>> GetUserInstallmentsByBankAsync(int userId, int bankId);
 }

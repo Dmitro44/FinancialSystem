@@ -1,0 +1,11 @@
+@model AccountViewModel
+
+<form id="newAccountForm" asp-action="CreateAccount" asp-controller="Client" method="post">
+    <input type="hidden" id="BankId" name="BankId" value="@ViewBag.BankId" />
+    
+    <div class="mb-3">
+        <label asp-for="Balance" class="form-label">Initial Balance</label>
+        <input type="number" asp-for="Balance" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create Account</button>
+</form>

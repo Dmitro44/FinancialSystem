@@ -26,11 +26,7 @@ public class BankRepository : IBankRepository
 
     public async Task UpdateAsync(Bank bank)
     {
-        var bankToUpdate = await _context.Banks.FindAsync(bank.Id);
-        if (bankToUpdate == null)
-        {
-            throw new ArgumentNullException(nameof(bank));
-        }
+        var bankToUpdate = await _context.Banks.FindAsync(bank.Id) ?? throw new ArgumentNullException(nameof(bank));
 
         bankToUpdate.UpdateDetails(
             bank.Name, 

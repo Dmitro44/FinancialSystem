@@ -18,8 +18,7 @@ public class UserController : BaseController
     [HttpGet]
     public async Task<IActionResult> Profile()
     {
-        var userId = GetCurrentUserId();
-        var user = await _userService.GetUserAsync(userId);
+        var user = await _userService.GetUserAsync(GetCurrentUserId());
 
         if (user == null)
         {

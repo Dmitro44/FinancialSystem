@@ -54,10 +54,11 @@ public class InstallmentRepository : IInstallmentRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Installment>> GetInstallmentsByUserIdAsync(int userId)
+    public async Task<IEnumerable<Installment>> GetUserInstallmentsByBankAsync(int userId, int bankId)
     {
         return await _context.Installments
-            .Where(installment => installment.PayerId == userId)
+            .Include(i => i.Payer)
+            .Where(installment => installment.PayerId == userId && installment.BankId == bankId)
             .ToListAsync();
     }
 }

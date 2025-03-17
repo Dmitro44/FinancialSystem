@@ -13,11 +13,12 @@ public class Loan
     public decimal TotalAmount { get; private set; }
     public decimal MonthlyPayment { get; private set; }
     public DateTime StartDate { get; private set; }
+    public LoanStatus Status { get; private set; }
 
     public Loan() {}
     public Loan(User borrower, Bank bank, decimal amount,
         int termMonths, decimal interestRate, decimal totalAmount,
-        decimal monthlyPayment, DateTime startDate)
+        decimal monthlyPayment)
     {
         Borrower = borrower;
         BorrowerId = borrower.Id;
@@ -28,7 +29,8 @@ public class Loan
         InterestRate = interestRate;
         TotalAmount = totalAmount;
         MonthlyPayment = monthlyPayment;
-        StartDate = startDate;
+        StartDate = DateTime.UtcNow.AddHours(3);
+        Status = LoanStatus.Pending;
     }
 
     public void UpdateDetails(decimal amount, int termInMonths,
@@ -42,4 +44,18 @@ public class Loan
         MonthlyPayment = monthlyPayment;
         StartDate = startDate;
     }
+
+    public void SetStatus(LoanStatus status)
+    {
+        if (status == LoanStatus.Pending) return;
+        
+        Status = status;
+    }
+}
+
+public enum LoanStatus
+{
+    Pending,
+    Approved,
+    Rejected
 }

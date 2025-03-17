@@ -44,6 +44,19 @@ public class LoanRepository : ILoanRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task UpdateStatusAsync(int loanId, LoanStatus newStatus)
+    {
+        var loanToUpdate = await _context.Loans.FindAsync(loanId);
+        if (loanToUpdate == null)
+        {
+            throw new ArgumentNullException(nameof(loanToUpdate));
+        }
+        
+        loanToUpdate.SetStatus(newStatus);
+        await _context.SaveChangesAsync();
+    }
+
+
     public async Task DeleteAsync(int loanId)
     {
         var loanToDelete = await _context.Loans.FindAsync(loanId);
@@ -56,10 +69,19 @@ public class LoanRepository : ILoanRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Loan>> GetLoansByUserIdAsync(int userId)
+    public async Task<IEnumerable<Loan>> GetUserLoansByBankAsync(int userId, int bankId)
     {
         return await _context.Loans
-            .Where(loan => loan.BorrowerId == userId)
+            .Include(l => l.Borrower)
+            .Where(loan => loan.BorrowerId == userId && loan.BankId == bankId && loan.Status == LoanStatus.Approved)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Loan>> GetLoansByBankAsync(int bankId)
+    {
+        return await _context.Loans
+            .Include(l => l.Borrower)
+            .Where(loan => loan.BankId == bankId)
             .ToListAsync();
     }
 }

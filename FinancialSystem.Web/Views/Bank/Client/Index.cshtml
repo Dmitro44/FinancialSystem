@@ -1,7 +1,7 @@
-@model BankViewModel
+@model FinancialSystem.Web.Models.Client.ClientBankViewModel
 
 @{
-    ViewData["Title"] = "My finances in " + @Model.BankName;
+    ViewData["Title"] = "My finances in " + Model.BankName;
 }
 
 <div class="container mt-4">
@@ -15,7 +15,7 @@
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accountsCollapse">
                     💰 My accounts (@Model.Accounts.Count)
                 </button>
-                <a href="#" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#newAccountModal">
+                <a href="#" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#newAccountModal" data-bank-id="@Model.BankId">
                     ➕ New Account
                 </a>
             </h2>
@@ -29,9 +29,9 @@
                                 <div class="col-md-4">
                                     <div class="card mb-3 border-primary">
                                         <div class="card-body">
-                                            <h5 class="card-title">№ @account.Id</h5>
-                                            <p class="card-text">Balance: <strong>@account.Balance ₽</strong></p>
-                                            <p class="card-text"><small class="text-muted">Type: @account.Owner.LastName</small></p>
+                                            <h5 class="card-title">Account № @account.Id</h5>
+                                            <p class="card-text">Balance: <strong>@account.Balance $</strong></p>
+                                            <p class="card-text"><small class="text-muted">Owner: @account.Owner.LastName @account.Owner.FirstName</small></p>
                                             <a href="@Url.Action("AccountDetails", "Bank", new { id = account.Id })" class="btn btn-primary">Details</a>
                                         </div>
                                     </div>
@@ -53,7 +53,9 @@
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#loansCollapse">
                     🏦 My loans (@Model.Loans.Count)
                 </button>
-                <a href="@Url.Action("CreateLoan", "Bank")" class="btn btn-outline-warning ms-2">➕ New Loan</a>
+                <a href="#" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#newLoanModal" data-bank-id="@Model.BankId">
+                    ➕ New Loan
+                </a>
             </h2>
             <div id="loansCollapse" class="accordion-collapse collapse">
                 <div class="accordion-body">
@@ -66,8 +68,10 @@
                                     <div class="card mb-3 border-warning">
                                         <div class="card-body">
                                             <h5 class="card-title">Loan № @loan.Id</h5>
-                                            <p class="card-text">Amount: <strong>@loan.Amount ₽</strong></p>
-                                            <p class="card-text"><small class="text-muted">Ставка: @loan.InterestRate%</small></p>
+                                            <p class="card-text">Amount: <strong>@loan.Amount $</strong></p>
+                                            <p class="card-text">Total amount: <strong>@loan.TotalAmount $</strong></p>
+                                            <p class="card-text"><small class="text-muted">Interest rate: @loan.InterestRate%</small></p>
+                                            <p class="card-text"><small class="text-muted">Borrower: @loan.Borrower.LastName @loan.Borrower.FirstName</small></p>
                                             <a href="@Url.Action("LoanDetails", "Bank", new { id = loan.Id })" class="btn btn-warning">Details</a>
                                         </div>
                                     </div>
@@ -132,8 +136,24 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @Html.Partial("_CreateAccount", new AccountViewModel())
+                @Html.Partial("_CreateAccount.cshtml", new AccountViewModel())
             </div>
         </div>
     </div>
 </div>
+
+@* Modal window for new loan *@
+<div class="modal fade" id="newLoanModal" tabindex="-1" aria-labelledby="newLoanModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newLoanModalLabel">Make a new loan request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("_CreateLoan.cshtml", new LoanViewModel())
+            </div>
+        </div>
+    </div>
+</div>
+
