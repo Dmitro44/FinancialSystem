@@ -1,3 +1,5 @@
+using FinancialSystem.Domain.Enums;
+
 namespace FinancialSystem.Domain.Entities;
 
 public class UserBankRole
@@ -19,13 +21,4 @@ public class UserBankRole
         BankId = bank.Id;
         Role = role;
     }
-}
-
-public enum Role
-{
-    Client,
-    Operator,
-    Manager,
-    EnterpriseSpecialist,
-    Administrator
 }

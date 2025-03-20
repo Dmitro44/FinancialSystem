@@ -1,1 +1,77 @@
 @model InstallmentViewModel
+
+<form id="newInstallmentForm" asp-action="CreateInstallment" asp-controller="Client" method="post">
+    <input type="hidden" id="BankId" name="BankId" value="@ViewBag.BankId"/>
+    
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label">Installment amount</label>
+        <input asp-for="Amount" id="Amount_installment" type="number" class="form-control" required onchange="calculateMonthlyPayment()"/>
+    </div>
+    <div class="mb-3">
+        <label asp-for="TermInMonths" class="form-label">Installment term</label>
+        <select asp-for="TermInMonths" id="TermInMonths_installment" class="form-select" onchange="toggleCustomInstallmentTerm(this)">
+            <option value="3" selected>3 months</option>
+            <option value="6">6 months</option>
+            <option value="12">12 months</option>
+            <option value="24">24 months</option>
+            <option value="36">More than 24 months (custom)</option>
+        </select>
+    </div>
+    
+    <!-- Поле для ввода пользовательского срока -->
+    <div class="mb-3" id="customTermDiv_installment" style="display:none;">
+        <label for="CustomTerm_installment" class="form-label">Custom term (months)</label>
+        <input type="number" class="form-control" id="CustomTerm_installment" name="CustomTerm_installment" min="25" onchange="calculateMonthlyPayment()" />
+    </div>
+    
+    <div class="mb-3">
+        <label asp-for="MonthlyPayment" class="form-label">Monthly payment</label>
+        <input asp-for="MonthlyPayment" id="MonthlyPayment_installment" type="number" class="form-control" readonly/>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create installment request</button>
+</form>
+
+<script>
+    // Функция для переключения поля ввода пользовательского срока
+    function toggleCustomInstallmentTerm(selectElement) {
+        var customTermDiv = document.getElementById('customTermDiv_installment');
+        var termInMonths = parseInt(selectElement.value);
+
+        if (termInMonths > 24) {
+            customTermDiv.style.display = 'block';
+        } else {
+            customTermDiv.style.display = 'none';
+            calculateMonthlyPayment();
+        }
+    }
+
+    function calculateMonthlyPayment() {
+        const amount = parseFloat(document.getElementById('Amount_installment').value);
+        let termInMonths = parseInt(document.getElementById('TermInMonths_installment').value);
+
+        if (termInMonths > 24) {
+            termInMonths = parseInt(document.getElementById('CustomTerm_installment').value);
+        }
+
+        if (!amount || !termInMonths) {
+            document.getElementById('MonthlyPayment_installment').value = '';
+            return;
+        }
+
+        fetch('/Installment/CalculateMonthlyPayment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount, termInMonths })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('MonthlyPayment_installment').value = data.monthlyPayment;
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    window.onload = function() {
+        toggleCustomInstallmentTerm(document.getElementById('TermInMonths_installment'));
+    };
+</script>

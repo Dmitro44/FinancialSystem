@@ -52,8 +52,20 @@ public class ClientController : BaseController
         return RedirectToAction("GetBankDetails", "Bank", new { bankId = model.BankId });
     }
     
-    public async Task<IActionResult> CreateInstallment()
+    public async Task<IActionResult> CreateInstallment(InstallmentViewModel model)
     {
-        throw new NotImplementedException();
+        var currentUserId = GetCurrentUserId();
+
+        var installmentDto = new InstallmentDto
+        {
+            Amount = model.Amount,
+            BankId = model.BankId,
+            TermInMonths = model.TermInMonths,
+            UserId = currentUserId
+        };
+        
+        await _bankService.CreateInstallmentAsync(installmentDto);
+        
+        return RedirectToAction("GetBankDetails", "Bank", new { bankId = model.BankId });
     }
 }

@@ -1,4 +1,5 @@
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

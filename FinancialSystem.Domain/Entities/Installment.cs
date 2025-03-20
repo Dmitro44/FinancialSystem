@@ -1,3 +1,5 @@
+using FinancialSystem.Domain.Enums;
+
 namespace FinancialSystem.Domain.Entities;
 
 public class Installment
@@ -9,14 +11,14 @@ public class Installment
     public int BankId { get; private set; }
     public decimal Amount { get; private set; }
     public int TermInMonths { get; private set; }
-    public decimal InterestRate { get; private set; }
     public decimal MonthlyPayment { get; private set; }
     public DateTime StartDate { get; private set; }
+    public RequestStatus Status { get; private set; }
 
     public Installment() {}
     public Installment(User payer, Bank bank, decimal amount,
-        int termInMonths, decimal interestRate,
-        decimal monthlyPayment, DateTime startDate)
+        int termInMonths, decimal monthlyPayment,
+        DateTime startDate)
     {
         Payer = payer;
         PayerId = payer.Id;
@@ -24,18 +26,24 @@ public class Installment
         BankId = bank.Id;
         Amount = amount;
         TermInMonths = termInMonths;
-        InterestRate = interestRate;
         MonthlyPayment = monthlyPayment;
         StartDate = startDate;
+        Status = RequestStatus.Pending;
     }
 
-    public void UpdateDetails(decimal amount, int termInMonths, decimal interestRate,
+    public void UpdateDetails(decimal amount, int termInMonths,
         decimal monthlyPayment, DateTime startDate)
     {
         Amount = amount;
         TermInMonths = termInMonths;
-        InterestRate = interestRate;
         MonthlyPayment = monthlyPayment;
         StartDate = startDate;
+    }
+
+    public void SetStatus(RequestStatus status)
+    {
+        if (status == RequestStatus.Pending) return;
+        
+        Status = status;
     }
 }

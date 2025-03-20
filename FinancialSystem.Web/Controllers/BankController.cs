@@ -1,6 +1,7 @@
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Application.Services;
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using FinancialSystem.Web.Models;
 using FinancialSystem.Web.Models.Client;
 using FinancialSystem.Web.Models.Manager;
@@ -104,12 +105,14 @@ public class BankController : BaseController
         if (role == Role.Manager)
         {
             var loanRequests = await _bankService.RetrieveLoansByBankAsync(bankId);
+            var installmentRequests = await _bankService.RetrieveInstallmentsByBankAsync(bankId);
 
             var model = new ManagerBankViewModel
             {
                 BankId = bankId,
                 BankName = bank.Name,
-                LoanRequests = loanRequests.ToList()
+                LoanRequests = loanRequests.ToList(),
+                InstallmentRequests = installmentRequests.ToList()
             };
             
             return View("Manager/Index", model);

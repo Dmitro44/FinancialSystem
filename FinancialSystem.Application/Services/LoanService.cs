@@ -1,5 +1,6 @@
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
 using Microsoft.VisualBasic;
 
@@ -57,7 +58,7 @@ public class LoanService
         await _loanRepository.UpdateAsync(loan);
     }
 
-    public async Task UpdateStatusAsync(int loanId, LoanStatus newStatus)
+    public async Task UpdateStatusAsync(int loanId, RequestStatus newStatus)
     {
         await _loanRepository.UpdateStatusAsync(loanId, newStatus);
     }

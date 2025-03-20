@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
 
 namespace FinancialSystem.Application.Services;

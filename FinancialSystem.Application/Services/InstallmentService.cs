@@ -1,5 +1,6 @@
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
 
 namespace FinancialSystem.Application.Services;
@@ -34,11 +35,25 @@ public class InstallmentService
             throw new ApplicationException($"Bank with id: {dto.BankId} does not exist.");
         }
         
-        return new Installment(payer, bank, dto.Amount, dto.TermInMonths, dto.InterestRate, monthlyPayment, dto.StartDate);
+        var installment = new Installment(payer, bank, dto.Amount, dto.TermInMonths, monthlyPayment, dto.StartDate);
+        
+        await _installmentRepository.AddAsync(installment);
+        
+        return installment;
     }
 
     public async Task<IEnumerable<Installment>> FetchUserInstallmentsByBankAsync(int userId, int bankId)
     {
         return await _installmentRepository.GetUserInstallmentsByBankAsync(userId, bankId);
+    }
+
+    public async Task<IEnumerable<Installment>> FetchInstallmentsByBankAsync(int bankId)
+    {
+        return await _installmentRepository.GetInstallmentsByBankAsync(bankId);
+    }
+
+    public async Task UpdateStatusAsync(int installmentId, RequestStatus newStatus)
+    {
+        await _installmentRepository.UpdateStatusAsync(installmentId, newStatus);
     }
 }

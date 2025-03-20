@@ -1,4 +1,5 @@
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,10 +36,21 @@ public class InstallmentRepository : IInstallmentRepository
         installmentToUpdate.UpdateDetails(
             installment.Amount,
             installment.TermInMonths,
-            installment.InterestRate,
             installment.MonthlyPayment,
             installment.StartDate);
         
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdateStatusAsync(int installmentId, RequestStatus newStatus)
+    {
+        var installmentToUpdate = await _context.Installments.FindAsync(installmentId);
+        if (installmentToUpdate == null)
+        {
+            throw new ArgumentNullException(nameof(installmentToUpdate));
+        }
+        
+        installmentToUpdate.SetStatus(newStatus);
         await _context.SaveChangesAsync();
     }
 
@@ -58,7 +70,15 @@ public class InstallmentRepository : IInstallmentRepository
     {
         return await _context.Installments
             .Include(i => i.Payer)
-            .Where(installment => installment.PayerId == userId && installment.BankId == bankId)
+            .Where(installment => installment.PayerId == userId && installment.BankId == bankId && installment.Status == RequestStatus.Approved)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<Installment>> GetInstallmentsByBankAsync(int bankId)
+    {
+        return await _context.Installments
+            .Include(i => i.Payer)
+            .Where(installment => installment.BankId == bankId)
             .ToListAsync();
     }
 }

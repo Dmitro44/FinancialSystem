@@ -1,5 +1,6 @@
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +45,7 @@ public class LoanRepository : ILoanRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateStatusAsync(int loanId, LoanStatus newStatus)
+    public async Task UpdateStatusAsync(int loanId, RequestStatus newStatus)
     {
         var loanToUpdate = await _context.Loans.FindAsync(loanId);
         if (loanToUpdate == null)
@@ -73,7 +74,7 @@ public class LoanRepository : ILoanRepository
     {
         return await _context.Loans
             .Include(l => l.Borrower)
-            .Where(loan => loan.BorrowerId == userId && loan.BankId == bankId && loan.Status == LoanStatus.Approved)
+            .Where(loan => loan.BorrowerId == userId && loan.BankId == bankId && loan.Status == RequestStatus.Approved)
             .ToListAsync();
     }
 

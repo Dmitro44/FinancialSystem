@@ -1,4 +1,5 @@
-@using FinancialSystem.Domain.Entities
+@using FinancialSystem.Domain.Enums
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model FinancialSystem.Web.Models.Manager.ManagerBankViewModel
 
 @{
@@ -6,7 +7,7 @@
 }
 
 <div class="container mt-4">
-    <h2>Loan and Installment Requests for @Model.BankName</h2>
+    <h2>Loan and installment requests for @Model.BankName</h2>
 
     <!-- Фильтр по статусу -->
     <div class="mb-3">
@@ -41,12 +42,12 @@
                 <td>@loan.Amount</td>
                 <td>@loan.TermInMonths</td>
                 <td>
-                    <span class="badge bg-@(loan.Status == LoanStatus.Approved ? "success" : loan.Status == LoanStatus.Rejected ? "danger" : "warning")">
+                    <span class="badge bg-@(loan.Status == RequestStatus.Approved ? "success" : loan.Status == RequestStatus.Rejected ? "danger" : "warning")">
                         @loan.Status
                     </span>
                 </td>
                 <td>
-                    @if (loan.Status == LoanStatus.Pending)
+                    @if (loan.Status == RequestStatus.Pending)
                     {
                         <form method="post" asp-controller="Manager" asp-action="ApproveLoan" style="display:inline;">
                             <input type="hidden" name="loanId" value="@loan.Id"/>
@@ -70,52 +71,56 @@
         </tbody>
     </table>
     
-    @* <!-- Таблица заявок на рассрочки --> *@
-    @* <h3>Installment Requests</h3> *@
-    @* <table class="table table-striped"> *@
-    @*     <thead> *@
-    @*         <tr> *@
-    @*             <th>Amount</th> *@
-    @*             <th>Term (months)</th> *@
-    @*             <th>Status</th> *@
-    @*             <th>Actions</th> *@
-    @*         </tr> *@
-    @*     </thead> *@
-    @*     <tbody id="installmentTable"> *@
-    @*         @foreach (var installment in Model.InstallmentRequests) *@
-    @*         { *@
-    @*             <tr class="request-row" data-status="@installment.Status"> *@
-    @*                 <td>@installment.Amount</td> *@
-    @*                 <td>@installment.TermInMonths</td> *@
-    @*                 <td> *@
-    @*                     <span class="badge bg-@(installment.Status == "Approved" ? "success" : installment.Status == "Rejected" ? "danger" : "warning")"> *@
-    @*                         @installment.Status *@
-    @*                     </span> *@
-    @*                 </td> *@
-    @*                 <td> *@
-    @*                     @if (installment.Status == "Pending") *@
-    @*                     { *@
-    @*                         <form method="post" asp-controller="Manager" asp-action="ApproveInstallment" style="display:inline;"> *@
-    @*                             <input type="hidden" name="installmentId" value="@installment.Id" /> *@
-    @*                             <input type="hidden" name="bankId" value="@Model.BankId" /> *@
-    @*                             <button type="submit" class="btn btn-success btn-sm">Approve</button> *@
-    @*                         </form> *@
-    @* *@
-    @*                         <form method="post" asp-controller="Manager" asp-action="RejectInstallment" style="display:inline;"> *@
-    @*                             <input type="hidden" name="installmentId" value="@installment.Id" /> *@
-    @*                             <input type="hidden" name="bankId" value="@Model.BankId" /> *@
-    @*                             <button type="submit" class="btn btn-danger btn-sm">Reject</button> *@
-    @*                         </form> *@
-    @*                     } *@
-    @*                     else *@
-    @*                     { *@
-    @*                         <span class="text-muted">Action not available</span> *@
-    @*                     } *@
-    @*                 </td> *@
-    @*             </tr> *@
-    @*         } *@
-    @*     </tbody> *@
-    @* </table> *@
+    <!-- Таблица заявок на рассрочки -->
+    <h3>Installment Requests</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Client LastName</th>
+            <th>Client FirstName</th>
+            <th>Amount</th>
+            <th>Term (months)</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="installmentTable">
+            @foreach (var installment in Model.InstallmentRequests)
+            {
+                <tr class="request-row" data-status="@installment.Status">
+                    <td>@installment.Payer.LastName</td>
+                    <td>@installment.Payer.FirstName</td>
+                    <td>@installment.Amount</td>
+                    <td>@installment.TermInMonths</td>
+                    <td>
+                        <span class="badge bg-@(installment.Status == RequestStatus.Approved ? "success" : installment.Status == RequestStatus.Rejected ? "danger" : "warning")">
+                            @installment.Status
+                        </span>
+                    </td>
+                    <td>
+                        @if (installment.Status == RequestStatus.Pending)
+                        {
+                            <form method="post" asp-controller="Manager" asp-action="ApproveInstallment" style="display:inline;">
+                                <input type="hidden" name="installmentId" value="@installment.Id"/>
+                                <input type="hidden" name="bankId" value="@Model.BankId"/>
+                                <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                            </form>
+
+                            <form method="post" asp-controller="Manager" asp-action="RejectInstallment" style="display:inline;">
+                                <input type="hidden" name="installmentId" value="@installment.Id"/>
+                                <input type="hidden" name="bankId" value="@Model.BankId"/>
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Action not available</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 <script>

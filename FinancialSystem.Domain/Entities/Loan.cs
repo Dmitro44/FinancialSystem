@@ -1,3 +1,5 @@
+using FinancialSystem.Domain.Enums;
+
 namespace FinancialSystem.Domain.Entities;
 
 public class Loan
@@ -13,7 +15,7 @@ public class Loan
     public decimal TotalAmount { get; private set; }
     public decimal MonthlyPayment { get; private set; }
     public DateTime StartDate { get; private set; }
-    public LoanStatus Status { get; private set; }
+    public RequestStatus Status { get; private set; }
 
     public Loan() {}
     public Loan(User borrower, Bank bank, decimal amount,
@@ -30,7 +32,7 @@ public class Loan
         TotalAmount = totalAmount;
         MonthlyPayment = monthlyPayment;
         StartDate = DateTime.UtcNow.AddHours(3);
-        Status = LoanStatus.Pending;
+        Status = RequestStatus.Pending;
     }
 
     public void UpdateDetails(decimal amount, int termInMonths,
@@ -45,17 +47,10 @@ public class Loan
         StartDate = startDate;
     }
 
-    public void SetStatus(LoanStatus status)
+    public void SetStatus(RequestStatus status)
     {
-        if (status == LoanStatus.Pending) return;
+        if (status == RequestStatus.Pending) return;
         
         Status = status;
     }
-}
-
-public enum LoanStatus
-{
-    Pending,
-    Approved,
-    Rejected
 }

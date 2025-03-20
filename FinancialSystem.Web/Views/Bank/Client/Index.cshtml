@@ -93,7 +93,9 @@
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#installmentsCollapse">
                     📆 My installments (@Model.Installments.Count)
                 </button>
-                <a href="@Url.Action("CreateInstallment", "Bank")" class="btn btn-outline-warning ms-2">➕ New Installment</a>
+                <a href="#" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#newInstallmentModal" data-bank-id="@Model.BankId">
+                    ➕ New Installment
+                </a>
             </h2>
             <div id="installmentsCollapse" class="accordion-collapse collapse">
                 <div class="accordion-body">
@@ -152,6 +154,21 @@
             </div>
             <div class="modal-body">
                 @Html.Partial("_CreateLoan.cshtml", new LoanViewModel())
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal window for new installment *@
+<div class="modal fade" id="newInstallmentModal" tabindex="-1" aria-labelledby="newInstallmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newInstallmentModalLabel">Make a new installment request</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("_CreateInstallment.cshtml", new InstallmentViewModel())
             </div>
         </div>
     </div>

@@ -83,6 +83,11 @@ public class BankService
         return await _loanService.FetchLoansByBankAsync(bankId);
     }
 
+    public async Task<IEnumerable<Installment>> RetrieveInstallmentsByBankAsync(int bankId)
+    {
+        return await _installmentService.FetchInstallmentsByBankAsync(bankId);
+    }
+
     public async Task CreateAccountAsync(AccountDto dto)
     {
         await _accountService.CreateAccountAsync(dto);
