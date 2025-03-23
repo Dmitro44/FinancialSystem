@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using FinancialSystem.Application.DTOs;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
@@ -9,9 +10,9 @@ namespace FinancialSystem.Application.Services;
 public class UserService
 {
     private readonly IUserRepository _userRepository;
-    private readonly JwtService _jwtService;
+    private readonly IJwtService _jwtService;
 
-    public UserService(IUserRepository userRepository, JwtService jwtService)
+    public UserService(IUserRepository userRepository, IJwtService jwtService)
     {
         _userRepository = userRepository;
         _jwtService = jwtService;

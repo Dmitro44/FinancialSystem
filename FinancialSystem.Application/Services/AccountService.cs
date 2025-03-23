@@ -1,10 +1,11 @@
 using FinancialSystem.Application.DTOs;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Interfaces;
 
 namespace FinancialSystem.Application.Services;
 
-public class AccountService
+public class AccountService : IAccountService
 {
     private readonly IAccountRepository _accountRepository;
     private readonly IUserRepository _userRepository;
@@ -18,7 +19,7 @@ public class AccountService
         _accountRepository = accountRepository;
     }
 
-    public async Task<Account> CreateAccountAsync(AccountDto dto)
+    public async Task CreateAccountAsync(AccountDto dto)
     {
         var user = await _userRepository.GetByIdAsync(dto.OwnerId);
         var bank = await _bankRepository.GetByIdAsync(dto.BankId);
@@ -35,8 +36,6 @@ public class AccountService
         var account = new Account(user, dto.Balance, bank);
         
         await _accountRepository.AddAsync(account);
-        
-        return account;
     }
 
     public async Task<IEnumerable<Account>> FetchUserAccountsByBankAsync(int userId, int bankId)

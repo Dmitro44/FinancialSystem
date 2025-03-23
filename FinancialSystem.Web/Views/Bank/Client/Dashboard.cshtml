@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Client Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Client Dashboard</h2>
+
+    <div class="row">
+        <!-- Счета, кредиты, рассрочки -->
+        <div class="col-md-6">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">💰 My Finances</h5>
+                    <p class="card-text">
+                        View your accounts, loans, and installments in one place.
+                    </p>
+                    <a href="@Url.Action("PrepareClientFinances", "Bank", new { bankId = ViewBag.BankId })" class="btn btn-primary">
+                        View My Finances
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Перевод средств -->
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-body">
+                    <h5 class="card-title">🔄 Transfer Funds</h5>
+                    <p class="card-text">
+                        Transfer money between your accounts or to other users securely.
+                    </p>
+                    <a href="@Url.Action("PrepareTransfer", "Client", new { bankId = ViewBag.BankId })" class="btn btn-success">
+                        Transfer Funds
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

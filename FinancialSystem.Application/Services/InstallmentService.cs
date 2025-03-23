@@ -1,11 +1,12 @@
 using FinancialSystem.Application.DTOs;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
 
 namespace FinancialSystem.Application.Services;
 
-public class InstallmentService
+public class InstallmentService : IInstallmentService
 {
     private readonly IUserRepository _userRepository;
     private readonly IBankRepository _bankRepository;
@@ -19,7 +20,7 @@ public class InstallmentService
         _installmentRepository = installmentRepository;
     }
 
-    public async Task<Installment> CreateInstallmentAsync(InstallmentDto dto)
+    public async Task CreateInstallmentAsync(InstallmentDto dto)
     {
         var monthlyPayment = FinancialCalculator.CalculateMonthlyPayment(dto.Amount, dto.TermInMonths);
 
@@ -38,8 +39,6 @@ public class InstallmentService
         var installment = new Installment(payer, bank, dto.Amount, dto.TermInMonths, monthlyPayment, dto.StartDate);
         
         await _installmentRepository.AddAsync(installment);
-        
-        return installment;
     }
 
     public async Task<IEnumerable<Installment>> FetchUserInstallmentsByBankAsync(int userId, int bankId)

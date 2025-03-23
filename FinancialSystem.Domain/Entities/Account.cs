@@ -23,4 +23,20 @@ public class Account
     {
         Balance = balance;
     }
+
+    public void Withdraw(decimal amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Amount cannot be negative");
+        
+        Balance -= amount;
+    }
+
+    public void Deposit(decimal amount)
+    {
+        if (amount <= 0)
+            throw new ArgumentException("Amount cannot be negative");
+        
+        Balance += amount;
+    }
 }

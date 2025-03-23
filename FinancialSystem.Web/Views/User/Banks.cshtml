@@ -1,4 +1,4 @@
-@model UserBanksViewModel
+@model FinancialSystem.Web.Models.Shared.UserBanksViewModel
 
 @{
     ViewData["Title"] = "Banks";
@@ -13,7 +13,7 @@
     @foreach (var bankRole in Model.RegisteredBanks)
     {
         <li>
-            <a asp-controller="Bank" asp-action="GetBankDetails" asp-route-bankId="@bankRole.BankId">
+            <a asp-controller="Bank" asp-action="RedirectToDashboard" asp-route-bankId="@bankRole.BankId">
                 @bankRole.Bank.Name
             </a> - <strong>@bankRole.Role</strong>
         </li>

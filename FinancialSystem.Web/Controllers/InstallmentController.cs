@@ -1,9 +1,11 @@
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinancialSystem.Web.Controllers;
 
+[Authorize]
 public class InstallmentController : BaseController
 {
     [HttpPost("[controller]/CalculateMonthlyPayment")]

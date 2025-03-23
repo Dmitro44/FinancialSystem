@@ -1,5 +1,6 @@
 using FinancialSystem.Application.Services;
 using FinancialSystem.Web.Models;
+using FinancialSystem.Web.Models.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

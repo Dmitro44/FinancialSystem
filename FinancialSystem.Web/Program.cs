@@ -1,4 +1,5 @@
 using FinancialSystem.Application.Configuration;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Application.Services;
 using FinancialSystem.Domain.Interfaces;
 using FinancialSystem.Infrastructure.Data;
@@ -19,19 +20,22 @@ public class Program
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         
-        builder.Services.AddScoped<BankService>();
+        builder.Services.AddScoped<IBankService, BankService>();
         builder.Services.AddScoped<IBankRepository, BankRepository>();
         
-        builder.Services.AddScoped<AccountService>();
+        builder.Services.AddScoped<IAccountService, AccountService>();
         builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         
-        builder.Services.AddScoped<LoanService>();
+        builder.Services.AddScoped<ILoanService, LoanService>();
         builder.Services.AddScoped<ILoanRepository, LoanRepository>();
         
-        builder.Services.AddScoped<InstallmentService>();
+        builder.Services.AddScoped<IInstallmentService, InstallmentService>();
         builder.Services.AddScoped<IInstallmentRepository, InstallmentRepository>();
+        
+        builder.Services.AddScoped<ITransferService, TransferService>();
+        builder.Services.AddScoped<ITransferRepository, TransferRepository>();
 
-        builder.Services.AddScoped<JwtService>();
+        builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));
         builder.Services.AddAuth(builder.Configuration);
 

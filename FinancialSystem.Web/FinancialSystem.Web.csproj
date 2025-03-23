@@ -23,4 +23,21 @@
       </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Views\Bank\Client\Partials\_CreateAccount.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Bank\Client\Partials\_CreateInstallment.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\Bank\Client\Partials\_CreateLoan.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Views\Bank\Client\Finances\Partials\_CreateAccount.cshtml" />
+      <AdditionalFiles Include="Views\Bank\Client\Finances\Partials\_CreateInstallment.cshtml" />
+      <AdditionalFiles Include="Views\Bank\Client\Finances\Partials\_CreateLoan.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\EnterpriseSpecialist\" />
+      <Folder Include="Models\EnterpriseSpecialist\" />
+    </ItemGroup>
+
 </Project>

@@ -1,0 +1,41 @@
+@model FinancialSystem.Web.Models.Client.TransferViewModel
+
+@{
+    ViewData["Title"] = "Transfer Funds";
+}
+
+<div class="container mt-4">
+    <h2>💸 Transfer Funds</h2>
+
+    <form asp-action="CreateTransfer" asp-controller="Client" method="post">
+        <input type="hidden" asp-for="BankId" value="@ViewBag.BankId" />
+        <div class="mb-3">
+            <label asp-for="SenderId" class="form-label">From account</label>
+            <select asp-for="SenderId" class="form-select">
+                @foreach (var account in Model.FromAccounts)
+                {
+                    <option value="@account.Id">Account № @account.Id — @account.Balance $</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="ReceiverId" class="form-label">To account</label>
+            <input asp-for="ReceiverId" class="form-control"/>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Amount" class="form-label"></label>
+            <input asp-for="Amount" step="0.01" type="number" class="form-control" required/>
+        </div>
+        
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger">
+                @Model.ErrorMessage
+            </div>
+        }
+
+        <button type="submit" class="btn btn-success">Transfer</button>
+    </form>
+</div>

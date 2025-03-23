@@ -2,7 +2,7 @@ using FinancialSystem.Domain.Entities;
 
 namespace FinancialSystem.Web.Models.Client;
 
-public class ClientBankViewModel
+public class ClientFinancesBankViewModel
 {
     public int BankId { get; set; }
     public string BankName { get; set; }

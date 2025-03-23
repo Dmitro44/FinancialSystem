@@ -1,27 +1,30 @@
 using FinancialSystem.Application.DTOs;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Interfaces;
 
 namespace FinancialSystem.Application.Services;
 
-public class BankService
+public class BankService : IBankService
 {
     private readonly IBankRepository _bankRepository;
     private readonly IUserRepository _userRepository;
     
-    private readonly AccountService _accountService;
-    private readonly LoanService _loanService;
-    private readonly InstallmentService _installmentService;
+    private readonly IAccountService _accountService;
+    private readonly ILoanService _loanService;
+    private readonly IInstallmentService _installmentService;
+    private readonly ITransferService _transferService;
 
     public BankService(IBankRepository bankRepository, IUserRepository userRepository,
-        AccountService accountService, LoanService loanService,
-        InstallmentService installmentService)
+        IAccountService accountService, ILoanService loanService,
+        IInstallmentService installmentService, ITransferService transferService)
     {
         _bankRepository = bankRepository;
         _userRepository = userRepository;
         _accountService = accountService;
         _loanService = loanService;
         _installmentService = installmentService;
+        _transferService = transferService;
     }
 
     public async Task RegisterUserToBankAsync(UserBankDto dto)
@@ -88,6 +91,11 @@ public class BankService
         return await _installmentService.FetchInstallmentsByBankAsync(bankId);
     }
 
+    public async Task<IEnumerable<Transfer>> RetrieveTransfersByBankAsync(int bankId)
+    {
+        return await _transferService.FetchTransfersByBankAsync(bankId);
+    }
+
     public async Task CreateAccountAsync(AccountDto dto)
     {
         await _accountService.CreateAccountAsync(dto);
@@ -101,5 +109,10 @@ public class BankService
     public async Task CreateInstallmentAsync(InstallmentDto dto)
     {
         await _installmentService.CreateInstallmentAsync(dto);
+    }
+
+    public async Task CreateTransferAsync(TransferDto transferDto)
+    {
+        await _transferService.CreateTransferAsync(transferDto);
     }
 }

@@ -2,13 +2,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using FinancialSystem.Application.Configuration;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FinancialSystem.Application.Services;
 
-public class JwtService(IOptions<AuthSettings> authSettings)
+public class JwtService(IOptions<AuthSettings> authSettings) : IJwtService
 {
     public string GenerateToken(User user)
     {

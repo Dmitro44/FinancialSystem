@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Manager Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Manager Dashboard</h2>
+
+    <div class="row">
+        <!-- Просмотр заявок на кредит/рассрочку -->
+        <div class="col-md-6">
+            <div class="card border-warning">
+                <div class="card-body">
+                    <h5 class="card-title">📋 Loan & Installment Requests</h5>
+                    <p class="card-text">
+                        Review and process loan and installment plan requests.
+                    </p>
+                    <a href="@Url.Action("PrepareLoanInstallmentRequests", "Bank", new { bankId = ViewBag.BankId })" class="btn btn-warning">
+                        View Requests
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Управление банковскими операциями -->
+        <div class="col-md-6">
+            <div class="card border-info">
+                <div class="card-body">
+                    <h5 class="card-title">🏦 Bank Operations</h5>
+                    <p class="card-text">
+                        Manage bank transactions and approve financial operations.
+                    </p>
+                    <a href="@Url.Action("BankOperations", "Manager", new { bankId = ViewBag.BankId })" class="btn btn-info">
+                        Manage Operations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

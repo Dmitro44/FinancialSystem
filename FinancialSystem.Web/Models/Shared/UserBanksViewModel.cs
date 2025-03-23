@@ -1,7 +1,7 @@
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Enums;
 
-namespace FinancialSystem.Web.Models;
+namespace FinancialSystem.Web.Models.Shared;
 
 public class UserBanksViewModel
 {

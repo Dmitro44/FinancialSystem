@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Operator Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Operator Dashboard</h2>
+
+    <div class="row">
+        <!-- Статистика по движениям средств + отмена перевода -->
+        <div class="col-md-6">
+            <div class="card border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">📊 Transaction Statistics</h5>
+                    <p class="card-text">
+                        View statistics on user transactions and cancel recent transfers if needed.
+                    </p>
+                    <a href="@Url.Action("TransferStatistics", "Bank", new { bankId = ViewBag.BankId })" class="btn btn-primary">
+                        View Statistics & Cancel Transfers
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Подтверждение заявки на зарплатный проект -->
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-body">
+                    <h5 class="card-title">📑 Approve Payroll Project</h5>
+                    <p class="card-text">
+                        Approve payroll applications after receiving enterprise data.
+                    </p>
+                    <a href="@Url.Action("ApprovePayroll", "Operator", new { bankId = ViewBag.BankId })" class="btn btn-success">
+                        Approve Payroll
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

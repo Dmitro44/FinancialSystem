@@ -19,12 +19,4 @@ public class BaseController : Controller
         
         return userId;
     }
-
-    public string GetUserFullName()
-    {
-        var firstName = User.Claims.FirstOrDefault(x => x.Type == "FirstName")?.Value ?? "Unknown";
-        var lastName = User.Claims.FirstOrDefault(x => x.Type == "LastName")?.Value ?? "User";
-
-        return $"{lastName} {firstName}";
-    }
 }

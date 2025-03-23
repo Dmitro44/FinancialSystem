@@ -1,10 +1,12 @@
 using FinancialSystem.Application.DTOs;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Application.Services;
-using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Enums;
 using FinancialSystem.Web.Models;
 using FinancialSystem.Web.Models.Client;
 using FinancialSystem.Web.Models.Manager;
+using FinancialSystem.Web.Models.Operator;
+using FinancialSystem.Web.Models.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +15,10 @@ namespace FinancialSystem.Web.Controllers;
 [Authorize]
 public class BankController : BaseController
 {
-    private readonly BankService _bankService;
+    private readonly IBankService _bankService;
     private readonly UserService _userService;
 
-    public BankController(BankService bankService, UserService userService)
+    public BankController(IBankService bankService, UserService userService)
     {
         _bankService = bankService;
         _userService = userService;
@@ -66,8 +68,33 @@ public class BankController : BaseController
         return View("~/Views/User/Banks.cshtml", model);
     }
 
-    [HttpGet("Details/{bankId}")]
-    public async Task<IActionResult> GetBankDetails(int bankId)
+    [HttpGet("Requests/{bankId}")]
+    public async Task<IActionResult> PrepareLoanInstallmentRequests(int bankId)
+    {
+        var bank = await _bankService.GetBankByIdAsync(bankId);
+
+        if (bank == null)
+        {
+            return NotFound("Bank not found");
+        }
+
+        var loanRequests = await _bankService.RetrieveLoansByBankAsync(bankId);
+        var installmentRequests = await _bankService.RetrieveInstallmentsByBankAsync(bankId);
+
+        var model = new ManagerRequestsViewModel
+        {
+            BankId = bankId,
+            BankName = bank.Name,
+            LoanRequests = loanRequests.ToList(),
+            InstallmentRequests = installmentRequests.ToList()
+        };
+
+        return View("Manager/Requests/Index", model);
+    }
+
+
+    [HttpGet("Finances/{bankId}")]
+    public async Task<IActionResult> PrepareClientFinances(int bankId)
     {
         var currentUserId = GetCurrentUserId();
         
@@ -77,47 +104,56 @@ public class BankController : BaseController
         {
             return NotFound("Bank not found");
         }
+        
+        var userAccounts = await _bankService.RetrieveUserAccountsByBankAsync(currentUserId, bankId);
+        var userLoans = await _bankService.RetrieveUserLoansByBankAsync(currentUserId, bankId);
+        var userInstallments = await _bankService.RetrieveUserInstallmentsByBankAsync(currentUserId, bankId);
+        
+        ViewBag.BankId = bankId;
+
+        var model = new ClientFinancesBankViewModel
+        {
+            BankId = bankId,
+            BankName = bank.Name,
+            Bic = bank.Bic,
+            Address = bank.Address,
+            Accounts = userAccounts.ToList(),
+            Loans = userLoans.ToList(),
+            Installments = userInstallments.ToList()
+        };
+        
+        return View("Client/Finances/Index", model);
+    }
+    
+
+    [HttpGet("RedirectToDashboard/{bankId}")]
+    public async Task<IActionResult> RedirectToDashboard(int bankId)
+    {
+        var currentUserId = GetCurrentUserId();
 
         var role = await _userService.GetRoleInBankAsync(currentUserId, bankId);
-        
-        if (role == Role.Client)
+
+        return role switch
         {
-            var userAccounts = await _bankService.RetrieveUserAccountsByBankAsync(currentUserId, bankId);
-            var userLoans = await _bankService.RetrieveUserLoansByBankAsync(currentUserId, bankId);
-            var userInstallments = await _bankService.RetrieveUserInstallmentsByBankAsync(currentUserId, bankId);
+            Role.Client => RedirectToAction("ShowClientDashboard", "Client", new { bankId }),
+            Role.Operator => RedirectToAction("ShowOperatorDashboard", "Operator", new { bankId }),
+            Role.Manager => RedirectToAction("ShowManagerDashboard", "Manager", new { bankId }),
+            _ => Forbid()
+        };
+    }
 
-            ViewBag.BankId = bankId;
-        
-            var model = new ClientBankViewModel
-            {
-                BankId = bankId,
-                BankName = bank.Name,
-                Bic = bank.Bic,
-                Address = bank.Address,
-                Accounts = userAccounts.ToList(),
-                Loans = userLoans.ToList(),
-                Installments = userInstallments.ToList()
-            };
-            
-            return View("Client/Index", model);
-        }
+    [HttpGet("TransferStatistics/{bankId}")]
+    public async Task<IActionResult> TransferStatistics(int bankId)
+    {
+        var transfers = await _bankService.RetrieveTransfersByBankAsync(bankId);
 
-        if (role == Role.Manager)
+        var model = new TransferStatisticsViewModel
         {
-            var loanRequests = await _bankService.RetrieveLoansByBankAsync(bankId);
-            var installmentRequests = await _bankService.RetrieveInstallmentsByBankAsync(bankId);
-
-            var model = new ManagerBankViewModel
-            {
-                BankId = bankId,
-                BankName = bank.Name,
-                LoanRequests = loanRequests.ToList(),
-                InstallmentRequests = installmentRequests.ToList()
-            };
-            
-            return View("Manager/Index", model);
-        }
-
-        return Forbid();
+            TransfersFromBank = transfers.ToList(),
+            ErrorMessage = TempData["ErrorMessage"]?.ToString(),
+            SuccessMessage = TempData["SuccessMessage"]?.ToString()
+        };
+        
+        return View("Operator/TransferStatistics/Index", model);
     }
 }

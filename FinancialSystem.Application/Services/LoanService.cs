@@ -1,4 +1,5 @@
 using FinancialSystem.Application.DTOs;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
@@ -6,7 +7,7 @@ using Microsoft.VisualBasic;
 
 namespace FinancialSystem.Application.Services;
 
-public class LoanService
+public class LoanService : ILoanService
 {
     private readonly ILoanRepository _loanRepository;
     private readonly IUserRepository _userRepository;
@@ -20,7 +21,7 @@ public class LoanService
         _loanRepository = loanRepository;
     }
 
-    public async Task<Loan> CreateLoanAsync(LoanDto dto)
+    public async Task CreateLoanAsync(LoanDto dto)
     {
         var bank = await _bankRepository.GetByIdAsync(dto.BankId)
             ?? throw new ApplicationException($"Bank with id: {dto.BankId} does not exist.");
@@ -31,8 +32,6 @@ public class LoanService
         var loan = new Loan(borrower, bank, dto.Amount, dto.TermInMonths, dto.InterestRate, dto.TotalAmount, dto.MonthlyPayment);
         
         await _loanRepository.AddAsync(loan);
-
-        return loan;
     }
 
     public async Task<IEnumerable<Loan>> FetchUserLoansByBankAsync(int userId, int bankId)

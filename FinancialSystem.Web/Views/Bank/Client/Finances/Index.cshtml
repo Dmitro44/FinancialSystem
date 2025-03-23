@@ -1,4 +1,5 @@
-@model FinancialSystem.Web.Models.Client.ClientBankViewModel
+@using FinancialSystem.Web.Models.Shared
+@model FinancialSystem.Web.Models.Client.ClientFinancesBankViewModel
 
 @{
     ViewData["Title"] = "My finances in " + Model.BankName;
@@ -138,7 +139,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @Html.Partial("_CreateAccount.cshtml", new AccountViewModel())
+                @Html.Partial("Partials/_CreateAccount.cshtml", new AccountViewModel())
             </div>
         </div>
     </div>
@@ -153,7 +154,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @Html.Partial("_CreateLoan.cshtml", new LoanViewModel())
+                @Html.Partial("Partials/_CreateLoan.cshtml", new LoanViewModel())
             </div>
         </div>
     </div>
@@ -168,7 +169,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @Html.Partial("_CreateInstallment.cshtml", new InstallmentViewModel())
+                @Html.Partial("Partials/_CreateInstallment.cshtml", new InstallmentViewModel())
             </div>
         </div>
     </div>

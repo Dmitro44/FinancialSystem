@@ -1,4 +1,4 @@
-namespace FinancialSystem.Web.Models;
+namespace FinancialSystem.Web.Models.Shared;
 
 public class ErrorViewModel
 {
