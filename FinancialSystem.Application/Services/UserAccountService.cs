@@ -5,21 +5,21 @@ using FinancialSystem.Domain.Interfaces;
 
 namespace FinancialSystem.Application.Services;
 
-public class AccountService : IAccountService
+public class UserAccountService : IUserAccountService
 {
-    private readonly IAccountRepository _accountRepository;
+    private readonly IUserAccountRepository _userAccountRepository;
     private readonly IUserRepository _userRepository;
     private readonly IBankRepository _bankRepository;
 
-    public AccountService(IUserRepository userRepository, IBankRepository bankRepository,
-        IAccountRepository accountRepository)
+    public UserAccountService(IUserRepository userRepository, IBankRepository bankRepository,
+        IUserAccountRepository userAccountRepository)
     {
         _userRepository = userRepository;
         _bankRepository = bankRepository;
-        _accountRepository = accountRepository;
+        _userAccountRepository = userAccountRepository;
     }
 
-    public async Task CreateAccountAsync(AccountDto dto)
+    public async Task CreateAccountAsync(UserAccountDto dto)
     {
         var user = await _userRepository.GetByIdAsync(dto.OwnerId);
         var bank = await _bankRepository.GetByIdAsync(dto.BankId);
@@ -33,13 +33,13 @@ public class AccountService : IAccountService
             throw new ApplicationException($"Bank with id: {dto.BankId} does not exist.");
         }
         
-        var account = new Account(user, dto.Balance, bank);
+        var account = new UserAccount(user, dto.Balance, bank);
         
-        await _accountRepository.AddAsync(account);
+        await _userAccountRepository.AddAsync(account);
     }
 
-    public async Task<IEnumerable<Account>> FetchUserAccountsByBankAsync(int userId, int bankId)
+    public async Task<IEnumerable<UserAccount>> FetchUserAccountsByBankAsync(int userId, int bankId)
     {
-        return await _accountRepository.GetUserAccountsByBankAsync(userId, bankId);
+        return await _userAccountRepository.GetUserAccountsByBankAsync(userId, bankId);
     }
 }

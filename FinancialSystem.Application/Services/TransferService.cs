@@ -9,20 +9,20 @@ namespace FinancialSystem.Application.Services;
 public class TransferService : ITransferService
 {
     private readonly ITransferRepository _transferRepository;
-    private readonly IAccountRepository _accountRepository;
+    private readonly IUserAccountRepository _userAccountRepository;
 
-    public TransferService(ITransferRepository transferRepository, IAccountRepository accountRepository)
+    public TransferService(ITransferRepository transferRepository, IUserAccountRepository userAccountRepository)
     {
         _transferRepository = transferRepository;
-        _accountRepository = accountRepository;
+        _userAccountRepository = userAccountRepository;
     }
 
     public async Task CreateTransferAsync(TransferDto dto)
     {
-        var senderAccount = await _accountRepository.GetByIdAsync(dto.SenderId)
+        var senderAccount = await _userAccountRepository.GetByIdAsync(dto.SenderId)
                             ?? throw new ApplicationException($"Account {dto.SenderId} does not exist");
 
-        var receiverAccount = await _accountRepository.GetByIdAsync(dto.ReceiverId)
+        var receiverAccount = await _userAccountRepository.GetByIdAsync(dto.ReceiverId)
                               ?? throw new ApplicationException($"Account {dto.ReceiverId} does not exist");
 
         if (senderAccount.Balance < dto.Amount)
@@ -33,8 +33,8 @@ public class TransferService : ITransferService
         senderAccount.Withdraw(dto.Amount);
         receiverAccount.Deposit(dto.Amount);
         
-        await _accountRepository.UpdateAsync(senderAccount);
-        await _accountRepository.UpdateAsync(receiverAccount);
+        await _userAccountRepository.UpdateAsync(senderAccount);
+        await _userAccountRepository.UpdateAsync(receiverAccount);
 
         var transfer = new Transfer(senderAccount, receiverAccount, dto.Amount, dto.Status);
 

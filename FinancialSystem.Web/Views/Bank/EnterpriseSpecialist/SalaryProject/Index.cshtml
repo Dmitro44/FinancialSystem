@@ -1,0 +1,70 @@
+@using FinancialSystem.Web.Models.EnterpriseSpecialist
+@model FinancialSystem.Web.Models.EnterpriseSpecialist.EnterpriseFinancesViewModel
+
+@{
+    ViewData["Title"] = "Salary Project";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Enterprise: @Model.EnterpriseName</h2>
+    <p><strong>UNP:</strong> @Model.EnterpriseUnp</p>
+    <p><strong>Type:</strong> @Model.EnterpriseType</p>
+    <p><strong>Address:</strong> @Model.EnterpriseAddress</p>
+
+    <div class="accordion" id="enterpriseDataAccordion">
+
+        <!-- SALARY PROJECTS -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="salaryProjectsHeading">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#salaryProjectsCollapse">
+                    💰 Salary Projects (@Model.SalaryProjects.Count)
+                </button>
+                <a href="#" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#newSalaryProjectModal" data-bank-id="@Model.BankId">
+                    ➕ New Salary Project
+                </a>
+            </h2>
+            <div id="salaryProjectsCollapse" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    @if (Model.SalaryProjects.Any())
+                    {
+                        <div class="row">
+                            @foreach (var project in Model.SalaryProjects)
+                            {
+                                <div class="col-md-4">
+                                    <div class="card mb-3 border-success">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Salary Project № @project.Id</h5>
+                                            <p class="card-text">Salary: <strong>@project.Salary</strong></p>
+                                            <p class="card-text"><small class="text-muted">Created: @project.CreatedAt.ToShortDateString()</small></p>
+                                            <a href="@Url.Action("SalaryProjectDetails", "EnterpriseSpecialist", new { id = project.Id })" class="btn btn-success">Details</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>This enterprise doesn't have any salary projects.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@* Modal window for new salary project *@
+<div class="modal fade" id="newSalaryProjectModal" tabindex="-1" aria-labelledby="newSalaryProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newSalaryProjectModalLabel">Create New Request for Salary Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("Partials/_CreateSalaryProject.cshtml", new SalaryProjectViewModel{ EnterpriseAccounts = Model.EnterpriseAccounts})
+            </div>
+        </div>
+    </div>
+</div>

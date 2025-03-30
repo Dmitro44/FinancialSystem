@@ -9,7 +9,7 @@ public class ClientFinancesBankViewModel
     public string Bic { get; set; }         // not used
     public string Address { get; set; }
 
-    public List<Account> Accounts = new();
+    public List<UserAccount> Accounts = new();
     public List<Loan> Loans = new();
     public List<Installment> Installments = new();
 }

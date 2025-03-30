@@ -1,0 +1,72 @@
+@using FinancialSystem.Web.Models.EnterpriseSpecialist
+@model FinancialSystem.Web.Models.EnterpriseSpecialist.EnterpriseFinancesViewModel
+
+@{
+    ViewData["Title"] = "Enterprise Accounts";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Enterprise: @Model.EnterpriseName</h2>
+    <p><strong>UNP:</strong> @Model.EnterpriseUnp</p>
+    <p><strong>Type:</strong> @Model.EnterpriseType</p>
+    <p><strong>Address:</strong> @Model.EnterpriseAddress</p>
+
+    <div class="accordion" id="enterpriseDataAccordion">
+
+        <!-- ENTERPRISE ACCOUNTS -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="accountsHeading">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#accountsCollapse">
+                    💼 Enterprise Accounts (@Model.EnterpriseAccounts.Count)
+                </button>
+                <a href="#" class="btn btn-outline-primary ms-2" data-bs-toggle="modal" data-bs-target="#newEnterpriseAccountModal" data-bank-id="@Model.BankId">
+                    ➕ New Enterprise Account
+                </a>
+            </h2>
+            <div id="accountsCollapse" class="accordion-collapse collapse show">
+                <div class="accordion-body">
+                    @if (Model.EnterpriseAccounts.Any())
+                    {
+                        <div class="row">
+                            @foreach (var account in Model.EnterpriseAccounts)
+                            {
+                                <div class="col-md-4">
+                                    <div class="card mb-3 border-primary">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Account № @account.Id</h5>
+                                            <p class="card-text">Balance: <strong>@account.Balance $</strong></p>
+                                            <p class="card-text"><small class="text-muted">Bank: @account.Bank.Name</small></p>
+                                            <div class="d-flex justify-content-between">
+                                                <a href="@Url.Action("EnterpriseAccountDetails", "EnterpriseSpecialist", new { id = account.Id })" class="btn btn-primary">Details</a>
+                                                <a href="@Url.Action("EnterpriseAccountTransactions", "EnterpriseSpecialist", new { id = account.Id })" class="btn btn-outline-secondary">Transactions</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p>This enterprise doesn't have any accounts.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* Modal window for new enterprise account *@
+<div class="modal fade" id="newEnterpriseAccountModal" tabindex="-1" aria-labelledby="newEnterpriseAccountModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newEnterpriseAccountModalLabel">Create New Enterprise Account</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("Partials/_CreateEnterpriseAccount.cshtml", new EnterpriseAccountViewModel())
+            </div>
+        </div>
+    </div>
+</div>

@@ -44,18 +44,18 @@ public class LoanService : ILoanService
         return await _loanRepository.GetLoansByBankAsync(bankId);
     }
 
-    public async Task<Loan?> GetLoanByIdAsync(int loanId)
-    {
-        var loan = await _loanRepository.GetByIdAsync(loanId)
-            ?? throw new InvalidOperationException($"Loan with id: {loanId} does not exist.");
-
-        return loan;
-    }
-
-    public async Task UpdateLoanAsync(Loan loan)
-    {
-        await _loanRepository.UpdateAsync(loan);
-    }
+    // public async Task<Loan?> GetLoanByIdAsync(int loanId)
+    // {
+    //     var loan = await _loanRepository.GetByIdAsync(loanId)
+    //         ?? throw new InvalidOperationException($"Loan with id: {loanId} does not exist.");
+    //
+    //     return loan;
+    // }
+    //
+    // public async Task UpdateLoanAsync(Loan loan)
+    // {
+    //     await _loanRepository.UpdateAsync(loan);
+    // }
 
     public async Task UpdateStatusAsync(int loanId, RequestStatus newStatus)
     {

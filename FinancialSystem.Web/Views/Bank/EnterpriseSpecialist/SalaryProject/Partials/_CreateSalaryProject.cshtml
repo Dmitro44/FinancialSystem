@@ -1,0 +1,25 @@
+@model FinancialSystem.Web.Models.EnterpriseSpecialist.SalaryProjectViewModel
+
+<form asp-action="CreateSalaryProject" asp-controller="EnterpriseSpecialist" method="post">
+    <input type="hidden" id="BankId" name="BankId" value="@ViewBag.BankId" />
+    
+    <div class="mb-3">
+        <label asp-for="EnterpriseAccountId" class="form-label">The company's salary payment account</label>
+        <select asp-for="EnterpriseAccountId" class="form-select">
+            @foreach (var account in Model.EnterpriseAccounts)
+            {
+                <option value="@account.Id">Account № @account.Id — @account.Balance $</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Salary" class="form-label">Salary amount</label>
+        <div class="input-group">
+            <input type="number" asp-for="Salary" class="form-control" min="0" step="0.01" required/>
+            <span class="input-group-text">$</span>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Create request for a salary project</button>
+</form>

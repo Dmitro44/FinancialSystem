@@ -18,6 +18,7 @@ public class User
     // Add smth for foreign clients
     
     public List<UserBankRole> UserBankRoles { get; private set; } = new();
+    public List<UserEnterprise> UserEnterprises { get; private set; } = new();
     public User() {}
 
     public User(string firstName, string lastName, string patronymic,

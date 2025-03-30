@@ -1,0 +1,39 @@
+@{
+    ViewData["Title"] = "Enterprise Specialist Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Enterprise Specialist Dashboard</h2>
+
+    <div class="row">
+        <!-- Просмотр счетов предприятия -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-primary h-100">
+                <div class="card-body">
+                    <h5 class="card-title">🏢 Enterprise Accounts</h5>
+                    <p class="card-text">
+                        View and manage accounts for all registered enterprises.
+                    </p>
+                    <a href="@Url.Action("EnterpriseAccounts", "EnterpriseSpecialist", new { bankId = ViewBag.BankId })" class="btn btn-primary">
+                        View Enterprise Accounts
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Зарплатные проекты -->
+        <div class="col-md-6 mb-4">
+            <div class="card border-success h-100">
+                <div class="card-body">
+                    <h5 class="card-title">💼 Salary Projects</h5>
+                    <p class="card-text">
+                        Manage salary projects for enterprises and their employees.
+                    </p>
+                    <a href="@Url.Action("SalaryProjects", "EnterpriseSpecialist", new { bankId = ViewBag.BankId })" class="btn btn-success">
+                        Manage Salary Projects
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

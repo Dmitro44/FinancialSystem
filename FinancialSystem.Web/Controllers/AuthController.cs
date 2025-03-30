@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using FinancialSystem.Application.DTOs;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Application.Services;
 using FinancialSystem.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,9 +9,9 @@ namespace FinancialSystem.Web.Controllers;
 
 public class AuthController : BaseController
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public AuthController(UserService userService)
+    public AuthController(IUserService userService)
     {
         _userService = userService;
     }

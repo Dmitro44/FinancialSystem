@@ -1,0 +1,116 @@
+@model FinancialSystem.Web.Models.Client.ClientSalaryProjectViewModel
+
+@{
+    ViewData["Title"] = "Available salary projects";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Available Salary Projects</h2>
+    
+    @if (!Model.AvailableSalaryProjects.Any())
+    {
+        <div class="alert alert-info">
+            <p class="mb-0">You don't have any available salary projects at the moment. This could be because:</p>
+            <ul class="mt-2 mb-0">
+                <li>You are not an employee of any enterprise</li>
+                <li>Your enterprises don't have salary projects in this bank</li>
+                <li>You are already connected to all available salary projects</li>
+            </ul>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var project in Model.AvailableSalaryProjects)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">@project.Enterprise.Name</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-university me-2"></i>
+                                    <strong>Bank:</strong> @project.Bank.Name
+                                </li>
+                                
+                                <li class="mb-2">
+                                    <i class="fas fa-money-bill-wave me-2"></i>
+                                    <strong>Salary:</strong> @project.Salary
+                                </li>
+                                
+                                <li class="mb-2">
+                                    <i class="far fa-calendar-alt me-2"></i>
+                                    <strong>Created:</strong> @project.CreatedAt.ToString("dd.MM.yyyy")
+                                </li>
+                            </ul>
+                            <p class="text-muted small mt-3">
+                                By connecting to this salary project, you'll receive your salary directly to your bank account.
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white border-top-0">
+                            <form asp-controller="Client" asp-action="ConnectToSalaryProject" method="post">
+                                <input type="hidden" name="salaryProjectId" value="@project.Id" />
+                                <input type="hidden" name="bankId" value="@project.BankId" />
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-link me-2"></i>Connect
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    
+    @if (Model.ConnectedSalaryProjects.Any())
+    {
+        <hr class="my-5" />
+        
+        <h2 class="mb-4">Your Connected Salary Projects</h2>
+        <div class="row">
+            @foreach (var project in Model.ConnectedSalaryProjects)
+            {
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-success">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="card-title mb-0">@project.SalaryProject.Enterprise.Name</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled">
+                                <li class="mb-2">
+                                    <i class="fas fa-university me-2"></i>
+                                    <strong>Bank:</strong> @project.SalaryProject.Bank.Name
+                                </li>
+                                
+                                <li class="mb-2">
+                                    <i class="fas fa-money-bill-wave me-2"></i>
+                                    <strong>Salary:</strong> @project.SalaryProject.Salary
+                                </li>
+                                
+                                <li class="mb-2">
+                                    <i class="far fa-calendar-alt me-2"></i>
+                                    <strong>Connected since:</strong> @project.JoinDate.ToString("dd.MM.yyyy")
+                                </li>
+                            </ul>
+                            <div class="mt-3">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Connected
+                                </span>
+                            </div>
+                        </div>
+                        <div class="card-footer bg-white border-top-0">
+                            <form asp-controller="Client" asp-action="DisconnectFromSalaryProject" method="post" onsubmit="return confirm('Are you sure you want to disconnect from this salary project?');">
+                                <input type="hidden" name="salaryProjectId" value="@project.Id" />
+                                <button type="submit" class="btn btn-outline-danger w-100">
+                                    <i class="fas fa-unlink me-2"></i>Disconnect
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

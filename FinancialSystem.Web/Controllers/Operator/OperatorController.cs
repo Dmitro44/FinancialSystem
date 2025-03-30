@@ -11,11 +11,13 @@ public class OperatorController : BaseController
 {
     private readonly IBankService _bankService;
     private readonly ITransferService _transferService;
+    private readonly ISalaryProjectService _salaryProjectService;
 
-    public OperatorController(ITransferService transferService, IBankService bankService)
+    public OperatorController(ITransferService transferService, IBankService bankService, ISalaryProjectService salaryProjectService)
     {
         _transferService = transferService;
         _bankService = bankService;
+        _salaryProjectService = salaryProjectService;
     }
 
     [HttpGet("OperatorDashboard/{bankId}")]
@@ -51,5 +53,19 @@ public class OperatorController : BaseController
             TempData["ErrorMessage"] = e.Message;
             return RedirectToAction("TransferStatistics", "Bank", new { bankId = transfer.Sender.BankId });
         }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ApproveSalaryProject(int projectId, int bankId)
+    {
+        await _salaryProjectService.UpdateStatusAsync(projectId, SalaryProjectStatus.Approved);
+        return RedirectToAction("PrepareSalaryProjectRequests", "Bank", new { bankId });
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> RejectSalaryProject(int projectId, int bankId)
+    {
+        await _salaryProjectService.UpdateStatusAsync(projectId, SalaryProjectStatus.Rejected);
+        return RedirectToAction("PrepareSalaryProjectRequests", "Bank", new { bankId });
     }
 }

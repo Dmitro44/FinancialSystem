@@ -1,0 +1,11 @@
+@model FinancialSystem.Web.Models.EnterpriseSpecialist.EnterpriseAccountViewModel
+
+<form id="newAccountForm" asp-action="CreateEnterpriseAccount" asp-controller="EnterpriseSpecialist" method="post">
+    <input type="hidden" id="BankId" name="BankId" value="@ViewBag.BankId" />
+    
+    <div class="mb-3">
+        <label asp-for="Balance" class="form-label">Initial Balance</label>
+        <input type="number" asp-for="Balance" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Create Account</button>
+</form>

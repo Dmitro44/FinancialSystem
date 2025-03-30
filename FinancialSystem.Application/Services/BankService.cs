@@ -10,21 +10,25 @@ public class BankService : IBankService
     private readonly IBankRepository _bankRepository;
     private readonly IUserRepository _userRepository;
     
-    private readonly IAccountService _accountService;
+    private readonly IUserAccountService _userAccountService;
+    private readonly IEnterpriseAccountService _enterpriseAccountService;
     private readonly ILoanService _loanService;
     private readonly IInstallmentService _installmentService;
     private readonly ITransferService _transferService;
+    private readonly ISalaryProjectService _salaryProjectService;
 
     public BankService(IBankRepository bankRepository, IUserRepository userRepository,
-        IAccountService accountService, ILoanService loanService,
-        IInstallmentService installmentService, ITransferService transferService)
+        IUserAccountService userAccountService, ILoanService loanService,
+        IInstallmentService installmentService, ITransferService transferService, IEnterpriseAccountService enterpriseAccountService, ISalaryProjectService salaryProjectService)
     {
         _bankRepository = bankRepository;
         _userRepository = userRepository;
-        _accountService = accountService;
+        _userAccountService = userAccountService;
         _loanService = loanService;
         _installmentService = installmentService;
         _transferService = transferService;
+        _enterpriseAccountService = enterpriseAccountService;
+        _salaryProjectService = salaryProjectService;
     }
 
     public async Task RegisterUserToBankAsync(UserBankDto dto)
@@ -66,9 +70,9 @@ public class BankService : IBankService
         return await _bankRepository.GetByIdAsync(bankId);
     }
 
-    public async Task<IEnumerable<Account>> RetrieveUserAccountsByBankAsync(int userId, int bankId)
+    public async Task<IEnumerable<UserAccount>> RetrieveUserAccountsByBankAsync(int userId, int bankId)
     {
-        return await _accountService.FetchUserAccountsByBankAsync(userId, bankId);
+        return await _userAccountService.FetchUserAccountsByBankAsync(userId, bankId);
     }
 
     public async Task<IEnumerable<Loan>> RetrieveUserLoansByBankAsync(int userId, int bankId)
@@ -96,9 +100,14 @@ public class BankService : IBankService
         return await _transferService.FetchTransfersByBankAsync(bankId);
     }
 
-    public async Task CreateAccountAsync(AccountDto dto)
+    public async Task<IEnumerable<SalaryProject>> RetrieveAllSalaryProjectsByBankAsync(int bankId)
     {
-        await _accountService.CreateAccountAsync(dto);
+        return await _salaryProjectService.FetchAllSalaryProjectsByBankAsync(bankId);
+    }
+
+    public async Task CreateAccountAsync(UserAccountDto dto)
+    {
+        await _userAccountService.CreateAccountAsync(dto);
     }
 
     public async Task CreateLoanAsync(LoanDto dto)

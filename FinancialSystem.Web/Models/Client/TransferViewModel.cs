@@ -10,7 +10,7 @@ public class TransferViewModel
     public int ReceiverId { get; set; }
     public decimal Amount { get; set; }
     
-    public List<Account> FromAccounts { get; set; }
+    public List<UserAccount> FromAccounts { get; set; }
 
     public string? ErrorMessage { get; set; }
 }

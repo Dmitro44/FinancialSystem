@@ -17,14 +17,20 @@ public class Program
         // Add services to the container.
         builder.Services.AddControllersWithViews();
 
-        builder.Services.AddScoped<UserService>();
+        builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         
         builder.Services.AddScoped<IBankService, BankService>();
         builder.Services.AddScoped<IBankRepository, BankRepository>();
         
-        builder.Services.AddScoped<IAccountService, AccountService>();
-        builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+        builder.Services.AddScoped<IEnterpriseService, EnterpriseService>();
+        builder.Services.AddScoped<IEnterpriseRepository, EnterpriseRepository>();
+        
+        builder.Services.AddScoped<IUserAccountService, UserAccountService>();
+        builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
+        
+        builder.Services.AddScoped<IEnterpriseAccountService, EnterpriseAccountService>();
+        builder.Services.AddScoped<IEnterpriseAccountRepository, EnterpriseAccountRepository>();
         
         builder.Services.AddScoped<ILoanService, LoanService>();
         builder.Services.AddScoped<ILoanRepository, LoanRepository>();
@@ -34,6 +40,13 @@ public class Program
         
         builder.Services.AddScoped<ITransferService, TransferService>();
         builder.Services.AddScoped<ITransferRepository, TransferRepository>();
+        
+        builder.Services.AddScoped<ISalaryProjectRepository, SalaryProjectRepository>();
+        builder.Services.AddScoped<ISalaryProjectService, SalaryProjectService>();
+        
+        builder.Services.AddScoped<IUserEnterpriseRepository, UserEnterpriseRepository>();
+
+        builder.Services.AddScoped<ISalaryProjectEmployeeRepository, SalaryProjectEmployeeRepository>();
 
         builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));

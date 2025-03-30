@@ -1,0 +1,95 @@
+@using FinancialSystem.Domain.Enums
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model FinancialSystem.Web.Models.Operator.OperatorRequestsViewModel
+
+@{
+    ViewData["Title"] = "Salary Project Requests";
+}
+
+<div class="container mt-4">
+    <h2>Salary Project Requests for @Model.BankName</h2>
+
+    <!-- Фильтр по статусу -->
+    <div class="mb-3">
+        <label for="statusFilter" class="form-label">Filter by Status:</label>
+        <select id="statusFilter" class="form-select" onchange="filterTable()">
+            <option value="All">All</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+        </select>
+    </div>
+
+    <!-- Таблица заявок на зарплатные проекты -->
+    <h3>Salary Project Requests</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Enterprise Name</th>
+            <th>UNP</th>
+            <th>Enterprise Account</th>
+            <th>Salary Amount</th>
+            <th>Creation Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody id="salaryProjectTable">
+        @foreach (var project in Model.SalaryProjectRequests)
+        {
+            <tr class="request-row" data-status="@project.Status">
+                <td>@project.Enterprise.Name</td>
+                <td>@project.Enterprise.Unp</td>
+                <td>№ @project.EnterpriseAccount.Id</td>
+                <td>@project.Salary $</td>
+                <td>@project.CreatedAt.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <span class="badge bg-@(project.Status == SalaryProjectStatus.Approved ? "success" : project.Status == SalaryProjectStatus.Rejected ? "danger" : "warning")">
+                        @project.Status
+                    </span>
+                </td>
+                <td>
+                    @if (project.Status == SalaryProjectStatus.Pending)
+                    {
+                        <div class="btn-group" role="group">
+                            <form method="post" asp-controller="Operator" asp-action="ApproveSalaryProject" style="display:inline;">
+                                <input type="hidden" name="projectId" value="@project.Id"/>
+                                <input type="hidden" name="bankId" value="@Model.BankId"/>
+                                <button type="submit" class="btn btn-success btn-sm me-1">Approve</button>
+                            </form>
+
+                            <form method="post" asp-controller="Operator" asp-action="RejectSalaryProject" style="display:inline;">
+                                <input type="hidden" name="projectId" value="@project.Id"/>
+                                <input type="hidden" name="bankId" value="@Model.BankId"/>
+                                <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                            </form>
+                        </div>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Action not available</span>
+                    }
+                </td>
+            </tr>
+        }
+        @if (!Model.SalaryProjectRequests.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center">No salary project requests available</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function filterTable() {
+        const filterValue = document.getElementById('statusFilter').value.toLowerCase();
+        const rows = document.querySelectorAll('.request-row');
+
+        rows.forEach(row => {
+            const status = row.getAttribute('data-status').toLowerCase();
+            row.style.display = (filterValue === 'all' || status === filterValue) ? '' : 'none';
+        });
+    }   
+</script>

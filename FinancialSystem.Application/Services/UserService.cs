@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
@@ -7,7 +6,7 @@ using FinancialSystem.Domain.Interfaces;
 
 namespace FinancialSystem.Application.Services;
 
-public class UserService
+public class UserService : IUserService
 {
     private readonly IUserRepository _userRepository;
     private readonly IJwtService _jwtService;

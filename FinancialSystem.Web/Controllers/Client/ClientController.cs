@@ -12,10 +12,12 @@ namespace FinancialSystem.Web.Controllers.Client;
 public class ClientController : BaseController
 {
     private readonly IBankService _bankService;
+    private readonly ISalaryProjectService _salaryProjectService;
 
-    public ClientController(IBankService bankService)
+    public ClientController(IBankService bankService, ISalaryProjectService salaryProjectService)
     {
         _bankService = bankService;
+        _salaryProjectService = salaryProjectService;
     }
 
     [HttpGet("ClientDashboard/{bankId}")]
@@ -30,7 +32,7 @@ public class ClientController : BaseController
     {
         var currentUserId = GetCurrentUserId();
         
-        var accountDto = new AccountDto
+        var accountDto = new UserAccountDto
         {
             Balance = model.Balance,
             BankId = model.BankId,
@@ -114,6 +116,7 @@ public class ClientController : BaseController
         try
         {
             await _bankService.CreateTransferAsync(transferDto);
+            return RedirectToAction("PrepareTransfer", "Client", new { bankId = model.BankId });
         }
         catch (Exception e)
         {
@@ -121,7 +124,29 @@ public class ClientController : BaseController
 
             return RedirectToAction("PrepareTransfer", "Client", new { bankId = model.BankId });
         }
+    }
+
+    [HttpGet("AvailableSalaryProjects/{bankId}")]
+    public async Task<IActionResult> PrepareAvailableSalaryProjects(int bankId)
+    {
+        var currentUserId = GetCurrentUserId();
+        var availableProjects = await _salaryProjectService.GetAvailableSalaryProjectsForUserAsync(currentUserId, bankId);
+        var connectedProjects = await _salaryProjectService.GetUserSalaryProjectsAsync(currentUserId);
+
+        var model = new ClientSalaryProjectViewModel
+        {
+            AvailableSalaryProjects = availableProjects,
+            ConnectedSalaryProjects = connectedProjects
+        };
         
-        return RedirectToAction("PrepareTransfer", "Client", new { bankId = model.BankId });
+        return View("~/Views/Bank/Client/SalaryProject/Index.cshtml", model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ConnectToSalaryProject(int salaryProjectId, int bankId)
+    {
+        var currentUserId = GetCurrentUserId();
+        await _salaryProjectService.ConnectUserToSalaryProject(currentUserId, salaryProjectId);
+        return RedirectToAction("PrepareAvailableSalaryProjects", "Client", new { bankId });
     }
 }

@@ -7,9 +7,9 @@ public class Enterprise : BaseEnterprise
     public Bank Bank { get; private set; }
     public int BankId { get; private set; }
     
-    public List<Account> Accounts { get; private set; } = new();
+    public List<UserAccount> EmployeeAccounts { get; private set; } = new();
     
-    public Enterprise() : base() {}
+    public Enterprise() {}
 
     public Enterprise(string type, string name, string unp, string address, Bank bank)
         : base(name, address)
@@ -18,5 +18,15 @@ public class Enterprise : BaseEnterprise
         Unp = unp;
         Bank = bank;
         BankId = bank.Id;
+    }
+
+    public void UpdateDetails(string type, string name, string unp, string address, Bank bank)
+    {
+        Type = type;
+        Unp = unp;
+        Bank = bank;
+        BankId = bank.Id;
+        
+        UpdateDetails(name, address);
     }
 }

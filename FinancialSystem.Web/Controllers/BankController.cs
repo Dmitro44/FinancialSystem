@@ -16,12 +16,14 @@ namespace FinancialSystem.Web.Controllers;
 public class BankController : BaseController
 {
     private readonly IBankService _bankService;
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
+    private readonly IEnterpriseService _enterpriseService; 
 
-    public BankController(IBankService bankService, UserService userService)
+    public BankController(IBankService bankService, IUserService userService, IEnterpriseService enterpriseService)
     {
         _bankService = bankService;
         _userService = userService;
+        _enterpriseService = enterpriseService;
     }
 
     [HttpPost]
@@ -89,7 +91,7 @@ public class BankController : BaseController
             InstallmentRequests = installmentRequests.ToList()
         };
 
-        return View("Manager/Requests/Index", model);
+        return View("Manager/LoanInstallmentRequests/Index", model);
     }
 
 
@@ -138,6 +140,7 @@ public class BankController : BaseController
             Role.Client => RedirectToAction("ShowClientDashboard", "Client", new { bankId }),
             Role.Operator => RedirectToAction("ShowOperatorDashboard", "Operator", new { bankId }),
             Role.Manager => RedirectToAction("ShowManagerDashboard", "Manager", new { bankId }),
+            Role.EnterpriseSpecialist => RedirectToAction("ShowEnterpriseSpecialistDashboard", "EnterpriseSpecialist", new { bankId }),
             _ => Forbid()
         };
     }
@@ -155,5 +158,28 @@ public class BankController : BaseController
         };
         
         return View("Operator/TransferStatistics/Index", model);
+    }
+
+    [HttpGet("SalaryProjectRequests/{bankId}")]
+    public async Task<IActionResult> PrepareSalaryProjectRequests(int bankId)
+    {
+        var bank = await _bankService.GetBankByIdAsync(bankId);
+        if (bank == null)
+        {
+            return NotFound("Bank not found");
+        }
+
+        var salaryProjectRequests = await _bankService.RetrieveAllSalaryProjectsByBankAsync(bankId);
+
+        ViewBag.BankId = bankId;
+        
+        var model = new OperatorRequestsViewModel
+        {
+            BankId = bankId,
+            BankName = bank.Name,
+            SalaryProjectRequests = salaryProjectRequests.ToList()
+        };
+
+        return View("Operator/SalaryProjectRequests/Index", model);
     }
 }

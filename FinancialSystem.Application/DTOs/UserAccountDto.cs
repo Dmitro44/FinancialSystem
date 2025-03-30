@@ -1,6 +1,6 @@
 namespace FinancialSystem.Application.DTOs;
 
-public class AccountDto
+public class UserAccountDto
 {
     public int OwnerId { get; set; }
     public int BankId { get; set; }

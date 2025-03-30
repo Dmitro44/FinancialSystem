@@ -1,5 +1,4 @@
-using FinancialSystem.Application.Services;
-using FinancialSystem.Web.Models;
+using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Web.Models.Shared;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,9 +8,9 @@ namespace FinancialSystem.Web.Controllers;
 [Authorize]
 public class UserController : BaseController
 {
-    private readonly UserService _userService;
+    private readonly IUserService _userService;
 
-    public UserController(UserService userService)
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
