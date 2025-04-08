@@ -19,6 +19,13 @@ public class SalaryProjectRepository : ISalaryProjectRepository
         return await _context.SalaryProjects.FindAsync(projectId);
     }
 
+    public async Task<SalaryProject?> GetByIdWithDetailsAsync(int projectId)
+    {
+        return await _context.SalaryProjects
+            .Include(sp => sp.EnterpriseAccount)
+            .FirstOrDefaultAsync(sp => sp.Id == projectId);
+    }
+
     public async Task AddAsync(SalaryProject salaryProject)
     {
         await _context.SalaryProjects.AddAsync(salaryProject);

@@ -6,7 +6,7 @@ public class Bank : BaseEnterprise
     public List<UserBankRole> UserBankRoles { get; private set; } = new();
     
     public List<Enterprise> Enterprises { get; private set; } = new();
-    public List<UserAccount> Accounts { get; private set; } = new();
+    public List<UserAccount> UserAccounts { get; private set; } = new();
     public List<Loan> Loans { get; private set; } = new();
     public List<Installment> Installments { get; private set; } = new();
     public List<Transfer> Transfers { get; private set; } = new();

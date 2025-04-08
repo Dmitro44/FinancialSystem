@@ -44,13 +44,26 @@ public class SalaryProjectEmployeeRepository : ISalaryProjectEmployeeRepository
     public async Task<SalaryProjectEmployee?> GetProjectByUserAndProjectIdAsync(int userId, int salaryProjectId)
     {
         return await _context.SalaryProjectEmployees
+            .Include(spe => spe.UserAccount)
             .FirstOrDefaultAsync(spe => spe.UserId == userId && spe.SalaryProjectId == salaryProjectId);
     }
 
-    public async Task<IEnumerable<SalaryProjectEmployee>> GetByUserIdAsync(int userId)
+    public async Task<IEnumerable<SalaryProjectEmployee>> GetByUserAndBankIdAsync(int userId, int bankId)
     {
         return await _context.SalaryProjectEmployees
-            .Where(spe => spe.UserId == userId)
+            .Include(spe => spe.SalaryProject)
+                .ThenInclude(s => s.Enterprise)
+            .Include(spe => spe.SalaryProject)
+                .ThenInclude(s => s.Bank)
+            .Where(spe => spe.UserId == userId && spe.SalaryProject.BankId == bankId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<SalaryProjectEmployee>> GetByProjectIdAsync(int projectId)
+    {
+        return await _context.SalaryProjectEmployees
+            .Include(spe => spe.UserAccount)
+            .Where(spe => spe.SalaryProjectId == projectId)
             .ToListAsync();
     }
 }

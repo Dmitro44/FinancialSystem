@@ -28,12 +28,19 @@
                             @foreach (var account in Model.Accounts)
                             {
                                 <div class="col-md-4">
-                                    <div class="card mb-3 border-primary">
+                                    <div class="card mb-3 @(account.IsActive ? "border-primary" : "border-secondary bg-light opacity-75")">
                                         <div class="card-body">
-                                            <h5 class="card-title">Account № @account.Id</h5>
-                                            <p class="card-text">Balance: <strong>@account.Balance $</strong></p>
+                                            <h5 class="card-title">
+                                                Account № @account.Id
+                                                @if (!account.IsActive)
+                                                {
+                                                    <span class="badge bg-secondary ms-2">Inactive</span>
+                                                }
+                                            </h5>
+                                            <p class="card-text @(!account.IsActive ? "text-muted" : "")">Type: <strong>@account.AccountType</strong></p>
+                                            <p class="card-text @(!account.IsActive ? "text-muted" : "")">Balance: <strong>@account.Balance $</strong></p>
                                             <p class="card-text"><small class="text-muted">Owner: @account.Owner.LastName @account.Owner.FirstName</small></p>
-                                            <a href="@Url.Action("AccountDetails", "Bank", new { id = account.Id })" class="btn btn-primary">Details</a>
+                                            @* <a href="@Url.Action("AccountDetails", "Bank", new { id = account.Id })" class="btn btn-primary">Details</a> *@
                                         </div>
                                     </div>
                                 </div>
@@ -73,7 +80,7 @@
                                             <p class="card-text">Total amount: <strong>@loan.TotalAmount $</strong></p>
                                             <p class="card-text"><small class="text-muted">Interest rate: @loan.InterestRate%</small></p>
                                             <p class="card-text"><small class="text-muted">Borrower: @loan.Borrower.LastName @loan.Borrower.FirstName</small></p>
-                                            <a href="@Url.Action("LoanDetails", "Bank", new { id = loan.Id })" class="btn btn-warning">Details</a>
+                                            @* <a href="@Url.Action("LoanDetails", "Bank", new { id = loan.Id })" class="btn btn-warning">Details</a> *@
                                         </div>
                                     </div>
                                 </div>
@@ -112,7 +119,7 @@
                                             <p class="card-text">Amount: <strong>@installment.Amount ₽</strong></p>
                                             <p class="card-text">Remain to pay: <strong>@installment.MonthlyPayment ₽</strong></p>
                                             <p class="card-text"><small class="text-muted">Term: @installment.TermInMonths months</small></p>
-                                            <a href="@Url.Action("InstallmentDetails", "Bank", new { id = installment.Id })" class="btn btn-success">Details</a>
+                                            @* <a href="@Url.Action("InstallmentDetails", "Bank", new { id = installment.Id })" class="btn btn-success">Details</a> *@
                                         </div>
                                     </div>
                                 </div>
@@ -154,7 +161,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @Html.Partial("Partials/_CreateLoan.cshtml", new LoanViewModel())
+                @Html.Partial("Partials/_CreateLoan.cshtml", new LoanViewModel{ UserAccounts = Model.Accounts })
             </div>
         </div>
     </div>
@@ -169,7 +176,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                @Html.Partial("Partials/_CreateInstallment.cshtml", new InstallmentViewModel())
+                @Html.Partial("Partials/_CreateInstallment.cshtml", new InstallmentViewModel{ UserAccounts = Model.Accounts})
             </div>
         </div>
     </div>

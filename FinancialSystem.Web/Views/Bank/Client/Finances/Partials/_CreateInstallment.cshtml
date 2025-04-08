@@ -24,6 +24,22 @@
         <input type="number" class="form-control" id="CustomTerm_installment" name="CustomTerm_installment" min="25" onchange="calculateMonthlyPayment()" />
     </div>
     
+    <!-- Выбор счета для зачисления средств -->
+    <div class="mb-3">
+        <label asp-for="DestinationAccountId" class="form-label">Destination Account for Loan Funds</label>
+        <div class="d-flex">
+            <select asp-for="DestinationAccountId" id="DestinationAccountId" class="form-select me-2">
+                @foreach (var account in Model.UserAccounts)
+                {
+                    <option value="@account.Id">
+                        Account #@account.Id - @account.AccountType 
+                        (@account.Balance)
+                    </option>
+                }
+            </select>
+        </div>
+    </div>
+    
     <div class="mb-3">
         <label asp-for="MonthlyPayment" class="form-label">Monthly payment</label>
         <input asp-for="MonthlyPayment" id="MonthlyPayment_installment" type="number" class="form-control" readonly/>

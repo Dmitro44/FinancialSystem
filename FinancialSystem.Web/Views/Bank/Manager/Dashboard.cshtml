@@ -20,17 +20,34 @@
                 </div>
             </div>
         </div>
-
-        <!-- Управление банковскими операциями -->
+        
+        <!-- Статистика по движениям средств + отмена перевода -->
         <div class="col-md-6">
-            <div class="card border-info">
+            <div class="card border-primary">
                 <div class="card-body">
-                    <h5 class="card-title">🏦 Bank Operations</h5>
+                    <h5 class="card-title">📊 Transaction Statistics</h5>
                     <p class="card-text">
-                        Manage bank transactions and approve financial operations.
+                        View statistics on user transactions and cancel recent transfers if needed.
                     </p>
-                    <a href="@Url.Action("BankOperations", "Manager", new { bankId = ViewBag.BankId })" class="btn btn-info">
-                        Manage Operations
+                    <a href="@Url.Action("TransferStatistics", "Bank", new { bankId = ViewBag.BankId })" class="btn btn-primary">
+                        View Statistics & Cancel Transfers
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Подтверждение заявки на зарплатный проект -->
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-body">
+                    <h5 class="card-title">📑 Approve Salary Project</h5>
+                    <p class="card-text">
+                        Approve salary project requests after receiving enterprise data.
+                    </p>
+                    <a href="@Url.Action("PrepareSalaryProjectRequests", "Bank", new { bankId = ViewBag.BankId })" class="btn btn-success">
+                        Approve Salary Project
                     </a>
                 </div>
             </div>

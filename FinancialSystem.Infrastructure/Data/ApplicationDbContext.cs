@@ -1,4 +1,5 @@
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -13,7 +14,8 @@ public class ApplicationDbContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<Bank> Banks { get; set; }
-    public DbSet<UserAccount> UserAccounts { get; set; }
+    public DbSet<Account> Accounts { get; set; }
+    public DbSet<UserAccount?> UserAccounts { get; set; }
     public DbSet<EnterpriseAccount> EnterpriseAccounts { get; set; }
     public DbSet<Enterprise> Enterprises  { get; set; }
     public DbSet<Installment> Installments { get; set; }
@@ -28,14 +30,30 @@ public class ApplicationDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<UserAccount>()
-            .HasOne(a => a.Owner)
+        modelBuilder.Entity<Account>()
+            .ToTable("Accounts")
+            .HasDiscriminator(a => a.Discriminator)
+            .HasValue<UserAccount>(AccountDiscriminator.User)
+            .HasValue<EnterpriseAccount>(AccountDiscriminator.Enterprise);
+        
+        modelBuilder.Entity<EnterpriseAccount>()
+            .HasOne(ea => ea.Enterprise)
             .WithMany()
-            .HasForeignKey(a => a.OwnerId);
+            .HasForeignKey(ea => ea.EnterpriseId);
+        
+        modelBuilder.Entity<UserAccount>()
+            .HasOne(ua => ua.Owner)
+            .WithMany()
+            .HasForeignKey(ua => ua.OwnerId);
+        
+        modelBuilder.Entity<UserAccount>()
+            .HasOne(ua => ua.EmployerEnterprise)
+            .WithMany(e => e.EmployeeAccounts)
+            .HasForeignKey(ua => ua.EmployerEnterpriseId);
         
         modelBuilder.Entity<UserAccount>()
             .HasOne(a => a.Bank)
-            .WithMany(b => b.Accounts)
+            .WithMany(b => b.UserAccounts)
             .HasForeignKey(a => a.BankId);
 
         modelBuilder.Entity<UserBankRole>()
@@ -66,5 +84,24 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<User>()
             .HasIndex(u => u.IdentificationNumber)
             .IsUnique();
+
+        modelBuilder.Entity<SalaryProjectEmployee>()
+            .HasOne(spe => spe.UserAccount)
+            .WithMany()
+            .HasForeignKey(spe => spe.UserAccountId);
+        
+        // Настройка Transfer с поддержкой полиморфных связей
+        modelBuilder.Entity<Transfer>()
+            .ToTable("Transfers")
+            .HasOne(t => t.Sender)
+            .WithMany()
+            .HasForeignKey(t => t.SenderId)
+            .OnDelete(DeleteBehavior.Restrict); // Предотвращаем каскадное удаление
+    
+        modelBuilder.Entity<Transfer>()
+            .HasOne(t => t.Receiver)
+            .WithMany()
+            .HasForeignKey(t => t.ReceiverId)
+            .OnDelete(DeleteBehavior.Restrict); // Предотвращаем каскадное удаление
     }
 }

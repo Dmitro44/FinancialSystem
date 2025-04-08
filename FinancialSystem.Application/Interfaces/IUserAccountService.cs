@@ -5,6 +5,6 @@ namespace FinancialSystem.Application.Interfaces;
 
 public interface IUserAccountService
 {
-    Task CreateAccountAsync(UserAccountDto userAccountDto);
+    Task<UserAccount?> CreateUserAccountAsync(UserAccountDto userAccountDto);
     Task<IEnumerable<UserAccount>> FetchUserAccountsByBankAsync(int userId, int bankId);
 }

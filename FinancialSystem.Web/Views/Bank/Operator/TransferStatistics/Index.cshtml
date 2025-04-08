@@ -50,6 +50,16 @@
                                     <span class="badge bg-info">Revert</span>
                                     break;
                             }
+                            
+                            @switch (transfer.Type)
+                            {
+                                case TransferType.Salary:
+                                    <span class="badge bg-primary">Salary</span>
+                                    break;
+                                case TransferType.Regular:
+                                    <span class="badge bg-dark">Regular</span>
+                                    break;
+                            }
                         </h5>
                         <p class="card-text"><strong>From:</strong> Account № @transfer.SenderId</p>
                         <p class="card-text"><strong>To:</strong> Account № @transfer.ReceiverId</p>

@@ -14,6 +14,8 @@ public class SalaryProject
     public decimal Salary { get; private set; }
     public int BankId { get; private set; }
     public Bank Bank { get; private set; }
+
+    public List<SalaryProjectEmployee> Employees { get; private set; } = new();
     
     public SalaryProject() {}
 

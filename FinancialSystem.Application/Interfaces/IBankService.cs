@@ -14,7 +14,7 @@ public interface IBankService
     Task<IEnumerable<Loan>> RetrieveLoansByBankAsync(int bankId);
     Task<IEnumerable<Installment>> RetrieveInstallmentsByBankAsync(int bankId);
     Task<IEnumerable<Transfer>> RetrieveTransfersByBankAsync(int bankId);
-    Task CreateAccountAsync(UserAccountDto dto);
+    Task<UserAccount?> CreateAccountAsync(UserAccountDto dto);
     Task CreateLoanAsync(LoanDto dto);
     Task CreateInstallmentAsync(InstallmentDto dto);
     Task CreateTransferAsync(TransferDto transferDto);

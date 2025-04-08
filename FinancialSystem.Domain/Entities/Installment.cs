@@ -15,10 +15,15 @@ public class Installment
     public DateTime StartDate { get; private set; }
     public RequestStatus Status { get; private set; }
 
+    public UserAccount? InstallmentAccount { get; set; }
+    public int? InstallmentAccountId { get; set; }
+
+    public int DestinationAccountId { get; set; }
+
     public Installment() {}
     public Installment(User payer, Bank bank, decimal amount,
         int termInMonths, decimal monthlyPayment,
-        DateTime startDate)
+        DateTime startDate, int destinationAccountId)
     {
         Payer = payer;
         PayerId = payer.Id;
@@ -29,6 +34,7 @@ public class Installment
         MonthlyPayment = monthlyPayment;
         StartDate = startDate;
         Status = RequestStatus.Pending;
+        DestinationAccountId = destinationAccountId;
     }
 
     public void UpdateDetails(decimal amount, int termInMonths,
@@ -45,5 +51,11 @@ public class Installment
         if (status == RequestStatus.Pending) return;
         
         Status = status;
+    }
+
+    public void AddInstallmentAccount(UserAccount installmentAccount)
+    {
+        InstallmentAccountId = installmentAccount.Id;
+        InstallmentAccount = installmentAccount;
     }
 }

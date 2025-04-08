@@ -8,4 +8,5 @@ public class TransferDto
     public int ReceiverId { get; set; }
     public decimal Amount { get; set; }
     public TransferStatus Status { get; set; }
+    public TransferType Type { get; set; }
 }

@@ -1,4 +1,3 @@
-using FinancialSystem.Application.DTOs;
 using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -7,17 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinancialSystem.Web.Controllers.Operator;
 
 [Authorize]
-public class OperatorController : BaseController
+[Route("Operator/[action]")]
+public class OperatorController : BankStaffBaseController
 {
-    private readonly IBankService _bankService;
-    private readonly ITransferService _transferService;
-    private readonly ISalaryProjectService _salaryProjectService;
-
-    public OperatorController(ITransferService transferService, IBankService bankService, ISalaryProjectService salaryProjectService)
+    public OperatorController(ITransferService transferService, ISalaryProjectService salaryProjectService)
+        :base(transferService, salaryProjectService)
     {
-        _transferService = transferService;
-        _bankService = bankService;
-        _salaryProjectService = salaryProjectService;
     }
 
     [HttpGet("OperatorDashboard/{bankId}")]
@@ -30,42 +24,18 @@ public class OperatorController : BaseController
     [HttpPost("CancelTransfer/{transferId}")]
     public async Task<IActionResult> CancelTransfer(int transferId)
     {
-        var transfer = await _transferService.GetByIdAsync(transferId);
-        if (transfer == null) return NotFound("Transfer not found");
-    
-        var transferDto = new TransferDto
-        {
-            SenderId = transfer.ReceiverId,
-            ReceiverId = transfer.SenderId,
-            Amount = transfer.Amount,
-            Status = TransferStatus.Revert
-        };
-
-        try
-        {
-            await _bankService.CreateTransferAsync(transferDto);
-            await _transferService.UpdateStatusAsync(transferId, TransferStatus.Canceled);
-            TempData["SuccessMessage"] = "Transfer has been canceled";
-            return RedirectToAction("TransferStatistics", "Bank", new { bankId = transfer.Sender.BankId });
-        }
-        catch (Exception e)
-        {
-            TempData["ErrorMessage"] = e.Message;
-            return RedirectToAction("TransferStatistics", "Bank", new { bankId = transfer.Sender.BankId });
-        }
+        return await CancelTransferBase(transferId);
     }
 
     [HttpPost]
     public async Task<IActionResult> ApproveSalaryProject(int projectId, int bankId)
     {
-        await _salaryProjectService.UpdateStatusAsync(projectId, SalaryProjectStatus.Approved);
-        return RedirectToAction("PrepareSalaryProjectRequests", "Bank", new { bankId });
+        return await ApproveSalaryProjectBase(projectId, bankId);
     }
     
     [HttpPost]
     public async Task<IActionResult> RejectSalaryProject(int projectId, int bankId)
     {
-        await _salaryProjectService.UpdateStatusAsync(projectId, SalaryProjectStatus.Rejected);
-        return RedirectToAction("PrepareSalaryProjectRequests", "Bank", new { bankId });
+        return await RejectSalaryProjectBase(projectId, bankId);
     }
 }

@@ -16,7 +16,9 @@ public class TransferRepository : ITransferRepository
 
     public async Task<Transfer?> GetByIdAsync(int transferId)
     {
-        return await _context.Transfers.FindAsync(transferId);
+        return await _context.Transfers
+            .Include(t => t.Sender)
+            .FirstOrDefaultAsync(t => t.Id == transferId);
     }
 
     public async Task AddAsync(Transfer transfer)

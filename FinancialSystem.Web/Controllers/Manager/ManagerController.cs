@@ -6,12 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace FinancialSystem.Web.Controllers.Manager;
 
 [Authorize]
-public class ManagerController : BaseController
+[Route("Manager/[action]")]
+public class ManagerController : BankStaffBaseController
 {
     private readonly ILoanService _loanService;
     private readonly IInstallmentService _installmentService;
 
-    public ManagerController(ILoanService loanService, IInstallmentService installmentService)
+    public ManagerController(ILoanService loanService, IInstallmentService installmentService, ISalaryProjectService salaryProjectService, ITransferService transferService)
+        :base(transferService, salaryProjectService)
     {
         _loanService = loanService;
         _installmentService = installmentService;
@@ -28,6 +30,8 @@ public class ManagerController : BaseController
     public async Task<IActionResult> ApproveLoan(int loanId, int bankId)
     {
         await _loanService.UpdateStatusAsync(loanId, RequestStatus.Approved);
+        await _loanService.AddLoanAccount(loanId);
+        await _loanService.SendLoanAmount(loanId);
         return RedirectToAction("PrepareLoanInstallmentRequests", "Bank", new { bankId });
     }
 
@@ -42,6 +46,8 @@ public class ManagerController : BaseController
     public async Task<IActionResult> ApproveInstallment(int installmentId, int bankId)
     {
         await _installmentService.UpdateStatusAsync(installmentId, RequestStatus.Approved);
+        await _installmentService.AddInstallmentAccount(installmentId);
+        await _installmentService.SendInstallmentAmount(installmentId);
         return RedirectToAction("PrepareLoanInstallmentRequests", "Bank", new { bankId });
     }
 
@@ -50,5 +56,23 @@ public class ManagerController : BaseController
     {
         await _installmentService.UpdateStatusAsync(installmentId, RequestStatus.Rejected);
         return RedirectToAction("PrepareLoanInstallmentRequests", "Bank", new { bankId });
+    }
+    
+    [HttpPost("CancelTransfer/{transferId}")]
+    public async Task<IActionResult> CancelTransfer(int transferId)
+    {
+        return await CancelTransferBase(transferId);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> ApproveSalaryProject(int projectId, int bankId)
+    {
+        return await ApproveSalaryProjectBase(projectId, bankId);
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> RejectSalaryProject(int projectId, int bankId)
+    {
+        return await RejectSalaryProjectBase(projectId, bankId);
     }
 }

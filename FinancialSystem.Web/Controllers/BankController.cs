@@ -141,6 +141,7 @@ public class BankController : BaseController
             Role.Operator => RedirectToAction("ShowOperatorDashboard", "Operator", new { bankId }),
             Role.Manager => RedirectToAction("ShowManagerDashboard", "Manager", new { bankId }),
             Role.EnterpriseSpecialist => RedirectToAction("ShowEnterpriseSpecialistDashboard", "EnterpriseSpecialist", new { bankId }),
+            Role.Administrator => RedirectToAction("ShowAdministratorDashboard", "Admin", new { bankId }),
             _ => Forbid()
         };
     }
@@ -157,7 +158,14 @@ public class BankController : BaseController
             SuccessMessage = TempData["SuccessMessage"]?.ToString()
         };
         
-        return View("Operator/TransferStatistics/Index", model);
+        var userRole = await _userService.GetRoleInBankAsync(GetCurrentUserId(), bankId);
+
+        return userRole switch
+        {
+            Role.Operator => View("Operator/TransferStatistics/Index", model),
+            Role.Manager => View("Manager/TransferStatistics/Index", model),
+            _ => Forbid()
+        };
     }
 
     [HttpGet("SalaryProjectRequests/{bankId}")]
@@ -179,7 +187,14 @@ public class BankController : BaseController
             BankName = bank.Name,
             SalaryProjectRequests = salaryProjectRequests.ToList()
         };
+        
+        var userRole = await _userService.GetRoleInBankAsync(GetCurrentUserId(), bankId);
 
-        return View("Operator/SalaryProjectRequests/Index", model);
+        return userRole switch
+        {
+            Role.Operator => View("Operator/SalaryProjectRequests/Index", model),
+            Role.Manager => View("Manager/SalaryProjectRequests/Index", model),
+            _ => Forbid()
+        };
     }
 }

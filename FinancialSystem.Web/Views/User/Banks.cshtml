@@ -4,38 +4,163 @@
     ViewData["Title"] = "Banks";
 }
 
-<head>
-    <title>Banks</title>
-</head>
-<body>
-<h2>My banks:</h2>
-<ul>
-    @foreach (var bankRole in Model.RegisteredBanks)
-    {
-        <li>
-            <a asp-controller="Bank" asp-action="RedirectToDashboard" asp-route-bankId="@bankRole.BankId">
-                @bankRole.Bank.Name
-            </a> - <strong>@bankRole.Role</strong>
-        </li>
-    }
-</ul>
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4 text-primary">
+                <i class="bi bi-bank"></i> Banks
+            </h1>
+            <p class="lead text-muted">Manage your banking relationships and discover new financial opportunities</p>
+            <hr class="my-4">
+        </div>
+    </div>
 
-<h2>Available banks:</h2>
-<form method="post" asp-controller="Bank" asp-action="RegisterToBank">
-    <ul>
-        @foreach (var bank in Model.OtherBanks)
-        {
-            <li>
-                @bank.Name
-                <select name="SelectRole_@bank.Id">
-                    @foreach (var role in Model.AvailableRoles)
+    <!-- My Banks Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-person-check"></i> My Registered Banks
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.RegisteredBanks.Any())
                     {
-                        <option value="@role">@role</option>
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                            @foreach (var bankRole in Model.RegisteredBanks)
+                            {
+                                <div class="col">
+                                    <div class="card h-100 border-primary hover-shadow">
+                                        <div class="card-body d-flex flex-column">
+                                            <h5 class="card-title">
+                                                <i class="bi bi-building"></i> @bankRole.Bank.Name
+                                            </h5>
+                                            <p class="card-text">
+                                                <span class="badge bg-info text-dark">
+                                                    <i class="bi bi-person-badge"></i> @bankRole.Role
+                                                </span>
+                                            </p>
+                                            <div class="mt-auto">
+                                                <a asp-controller="Bank" asp-action="RedirectToDashboard" 
+                                                   asp-route-bankId="@bankRole.BankId"
+                                                   class="btn btn-outline-primary d-block">
+                                                    <i class="bi bi-arrow-right-circle"></i> Access Dashboard
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     }
-                </select>
-                <button type="submit" name="bankId" value="@bank.Id">Register</button>
-            </li>
-        }
-    </ul>
-</form>
-</body>
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> You haven't registered with any banks yet. Explore the available banks below.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Banks Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-bank"></i> Available Banks
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if (Model.OtherBanks.Any())
+                    {
+                        <form method="post" asp-controller="Bank" asp-action="RegisterToBank">
+                            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                                @foreach (var bank in Model.OtherBanks)
+                                {
+                                    <div class="col">
+                                        <div class="card h-100 border-success hover-shadow">
+                                            <div class="card-body d-flex flex-column">
+                                                <h5 class="card-title">
+                                                    <i class="bi bi-building"></i> @bank.Name
+                                                </h5>
+                                                <p class="card-text small text-muted mb-3">
+                                                    <i class="bi bi-geo-alt"></i> @bank.Address
+                                                </p>
+                                                <div class="mt-auto">
+                                                    <div class="input-group mb-3">
+                                                        <span class="input-group-text">
+                                                            <i class="bi bi-person-badge"></i>
+                                                        </span>
+                                                        <select name="SelectRole_@bank.Id" class="form-select">
+                                                            <option disabled selected>Select role...</option>
+                                                            @foreach (var role in Model.AvailableRoles)
+                                                            {
+                                                                <option value="@role">@role</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                    <button type="submit" name="bankId" value="@bank.Id" 
+                                                            class="btn btn-success d-block w-100">
+                                                        <i class="bi bi-plus-circle"></i> Register
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> No additional banks are available for registration at this time.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Hover effect for cards */
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06) !important;
+        transition: all 0.3s ease;
+    }
+    
+    /* Smooth transitions */
+    .card {
+        transition: all 0.3s ease;
+    }
+    
+    /* Better spacing */
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    /* Custom badge styling */
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5rem 0.7rem;
+    }
+</style>
+
+<!-- Add Bootstrap Icons CDN link in your _Layout.cshtml file -->
+@section Scripts {
+    <script>
+        // Add any custom JavaScript if needed
+        $(document).ready(function() {
+            // Animation for cards on load
+            $('.card').hide().each(function(i) {
+                $(this).delay(i * 100).fadeIn(500);
+            });
+        });
+    </script>
+}

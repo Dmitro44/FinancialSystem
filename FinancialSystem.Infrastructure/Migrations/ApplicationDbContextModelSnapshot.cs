@@ -22,6 +22,35 @@ namespace FinancialSystem.Infrastructure.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("FinancialSystem.Domain.Entities.Account", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("BankId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Discriminator")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Accounts", (string)null);
+
+                    b.HasDiscriminator();
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("FinancialSystem.Domain.Entities.Bank", b =>
                 {
                     b.Property<int>("Id")
@@ -81,32 +110,6 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.ToTable("Enterprises");
                 });
 
-            modelBuilder.Entity("FinancialSystem.Domain.Entities.EnterpriseAccount", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("BankId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("EnterpriseId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BankId");
-
-                    b.HasIndex("EnterpriseId");
-
-                    b.ToTable("EnterpriseAccounts");
-                });
-
             modelBuilder.Entity("FinancialSystem.Domain.Entities.Installment", b =>
                 {
                     b.Property<int>("Id")
@@ -119,6 +122,12 @@ namespace FinancialSystem.Infrastructure.Migrations
                         .HasColumnType("numeric");
 
                     b.Property<int>("BankId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("DestinationAccountId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("InstallmentAccountId")
                         .HasColumnType("integer");
 
                     b.Property<decimal>("MonthlyPayment")
@@ -139,6 +148,8 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("BankId");
+
+                    b.HasIndex("InstallmentAccountId");
 
                     b.HasIndex("PayerId");
 
@@ -162,8 +173,14 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.Property<int>("BorrowerId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("DestinationAccountId")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("InterestRate")
                         .HasColumnType("numeric");
+
+                    b.Property<int?>("LoanAccountId")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("MonthlyPayment")
                         .HasColumnType("numeric");
@@ -185,6 +202,8 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.HasIndex("BankId");
 
                     b.HasIndex("BorrowerId");
+
+                    b.HasIndex("LoanAccountId");
 
                     b.ToTable("Loans");
                 });
@@ -240,12 +259,17 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.Property<int>("SalaryProjectId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("UserAccountId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SalaryProjectId");
+
+                    b.HasIndex("UserAccountId");
 
                     b.HasIndex("UserId");
 
@@ -278,6 +302,9 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.Property<DateTime>("TransferDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BankId");
@@ -286,7 +313,7 @@ namespace FinancialSystem.Infrastructure.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Transfers");
+                    b.ToTable("Transfers", (string)null);
                 });
 
             modelBuilder.Entity("FinancialSystem.Domain.Entities.User", b =>
@@ -341,37 +368,6 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("FinancialSystem.Domain.Entities.UserAccount", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("BankId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("EnterpriseId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("OwnerId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BankId");
-
-                    b.HasIndex("EnterpriseId");
-
-                    b.HasIndex("OwnerId");
-
-                    b.ToTable("UserAccounts");
-                });
-
             modelBuilder.Entity("FinancialSystem.Domain.Entities.UserBankRole", b =>
                 {
                     b.Property<int>("Id")
@@ -421,6 +417,42 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.ToTable("UserEnterprises");
                 });
 
+            modelBuilder.Entity("FinancialSystem.Domain.Entities.EnterpriseAccount", b =>
+                {
+                    b.HasBaseType("FinancialSystem.Domain.Entities.Account");
+
+                    b.Property<int>("EnterpriseId")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("BankId");
+
+                    b.HasIndex("EnterpriseId");
+
+                    b.HasDiscriminator().HasValue(2);
+                });
+
+            modelBuilder.Entity("FinancialSystem.Domain.Entities.UserAccount", b =>
+                {
+                    b.HasBaseType("FinancialSystem.Domain.Entities.Account");
+
+                    b.Property<int>("AccountType")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EmployerEnterpriseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("OwnerId")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("BankId");
+
+                    b.HasIndex("EmployerEnterpriseId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.HasDiscriminator().HasValue(1);
+                });
+
             modelBuilder.Entity("FinancialSystem.Domain.Entities.Enterprise", b =>
                 {
                     b.HasOne("FinancialSystem.Domain.Entities.Bank", "Bank")
@@ -432,25 +464,6 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.Navigation("Bank");
                 });
 
-            modelBuilder.Entity("FinancialSystem.Domain.Entities.EnterpriseAccount", b =>
-                {
-                    b.HasOne("FinancialSystem.Domain.Entities.Bank", "Bank")
-                        .WithMany()
-                        .HasForeignKey("BankId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FinancialSystem.Domain.Entities.Enterprise", "Enterprise")
-                        .WithMany()
-                        .HasForeignKey("EnterpriseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bank");
-
-                    b.Navigation("Enterprise");
-                });
-
             modelBuilder.Entity("FinancialSystem.Domain.Entities.Installment", b =>
                 {
                     b.HasOne("FinancialSystem.Domain.Entities.Bank", "Bank")
@@ -459,6 +472,10 @@ namespace FinancialSystem.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FinancialSystem.Domain.Entities.UserAccount", "InstallmentAccount")
+                        .WithMany()
+                        .HasForeignKey("InstallmentAccountId");
+
                     b.HasOne("FinancialSystem.Domain.Entities.User", "Payer")
                         .WithMany()
                         .HasForeignKey("PayerId")
@@ -466,6 +483,8 @@ namespace FinancialSystem.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Bank");
+
+                    b.Navigation("InstallmentAccount");
 
                     b.Navigation("Payer");
                 });
@@ -484,9 +503,15 @@ namespace FinancialSystem.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FinancialSystem.Domain.Entities.UserAccount", "LoanAccount")
+                        .WithMany()
+                        .HasForeignKey("LoanAccountId");
+
                     b.Navigation("Bank");
 
                     b.Navigation("Borrower");
+
+                    b.Navigation("LoanAccount");
                 });
 
             modelBuilder.Entity("FinancialSystem.Domain.Entities.SalaryProject", b =>
@@ -519,8 +544,14 @@ namespace FinancialSystem.Infrastructure.Migrations
             modelBuilder.Entity("FinancialSystem.Domain.Entities.SalaryProjectEmployee", b =>
                 {
                     b.HasOne("FinancialSystem.Domain.Entities.SalaryProject", "SalaryProject")
-                        .WithMany()
+                        .WithMany("Employees")
                         .HasForeignKey("SalaryProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinancialSystem.Domain.Entities.UserAccount", "UserAccount")
+                        .WithMany()
+                        .HasForeignKey("UserAccountId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -533,6 +564,8 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.Navigation("SalaryProject");
 
                     b.Navigation("User");
+
+                    b.Navigation("UserAccount");
                 });
 
             modelBuilder.Entity("FinancialSystem.Domain.Entities.Transfer", b =>
@@ -541,44 +574,21 @@ namespace FinancialSystem.Infrastructure.Migrations
                         .WithMany("Transfers")
                         .HasForeignKey("BankId");
 
-                    b.HasOne("FinancialSystem.Domain.Entities.UserAccount", "Receiver")
+                    b.HasOne("FinancialSystem.Domain.Entities.Account", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("FinancialSystem.Domain.Entities.UserAccount", "Sender")
+                    b.HasOne("FinancialSystem.Domain.Entities.Account", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
-                });
-
-            modelBuilder.Entity("FinancialSystem.Domain.Entities.UserAccount", b =>
-                {
-                    b.HasOne("FinancialSystem.Domain.Entities.Bank", "Bank")
-                        .WithMany("Accounts")
-                        .HasForeignKey("BankId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FinancialSystem.Domain.Entities.Enterprise", null)
-                        .WithMany("EmployeeAccounts")
-                        .HasForeignKey("EnterpriseId");
-
-                    b.HasOne("FinancialSystem.Domain.Entities.User", "Owner")
-                        .WithMany()
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Bank");
-
-                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("FinancialSystem.Domain.Entities.UserBankRole", b =>
@@ -619,10 +629,52 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FinancialSystem.Domain.Entities.EnterpriseAccount", b =>
+                {
+                    b.HasOne("FinancialSystem.Domain.Entities.Bank", "Bank")
+                        .WithMany()
+                        .HasForeignKey("BankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinancialSystem.Domain.Entities.Enterprise", "Enterprise")
+                        .WithMany()
+                        .HasForeignKey("EnterpriseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bank");
+
+                    b.Navigation("Enterprise");
+                });
+
+            modelBuilder.Entity("FinancialSystem.Domain.Entities.UserAccount", b =>
+                {
+                    b.HasOne("FinancialSystem.Domain.Entities.Bank", "Bank")
+                        .WithMany("UserAccounts")
+                        .HasForeignKey("BankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FinancialSystem.Domain.Entities.Enterprise", "EmployerEnterprise")
+                        .WithMany("EmployeeAccounts")
+                        .HasForeignKey("EmployerEnterpriseId");
+
+                    b.HasOne("FinancialSystem.Domain.Entities.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bank");
+
+                    b.Navigation("EmployerEnterprise");
+
+                    b.Navigation("Owner");
+                });
+
             modelBuilder.Entity("FinancialSystem.Domain.Entities.Bank", b =>
                 {
-                    b.Navigation("Accounts");
-
                     b.Navigation("Enterprises");
 
                     b.Navigation("Installments");
@@ -631,12 +683,19 @@ namespace FinancialSystem.Infrastructure.Migrations
 
                     b.Navigation("Transfers");
 
+                    b.Navigation("UserAccounts");
+
                     b.Navigation("UserBankRoles");
                 });
 
             modelBuilder.Entity("FinancialSystem.Domain.Entities.Enterprise", b =>
                 {
                     b.Navigation("EmployeeAccounts");
+                });
+
+            modelBuilder.Entity("FinancialSystem.Domain.Entities.SalaryProject", b =>
+                {
+                    b.Navigation("Employees");
                 });
 
             modelBuilder.Entity("FinancialSystem.Domain.Entities.User", b =>

@@ -16,11 +16,16 @@ public class Loan
     public decimal MonthlyPayment { get; private set; }
     public DateTime StartDate { get; private set; }
     public RequestStatus Status { get; private set; }
+    
+    public UserAccount? LoanAccount { get; private set; }
+    public int? LoanAccountId { get; private set; }
+    
+    public int DestinationAccountId { get; private set; }
 
     public Loan() {}
     public Loan(User borrower, Bank bank, decimal amount,
         int termMonths, decimal interestRate, decimal totalAmount,
-        decimal monthlyPayment)
+        decimal monthlyPayment, int destinationAccountId)
     {
         Borrower = borrower;
         BorrowerId = borrower.Id;
@@ -33,6 +38,7 @@ public class Loan
         MonthlyPayment = monthlyPayment;
         StartDate = DateTime.UtcNow.AddHours(3);
         Status = RequestStatus.Pending;
+        DestinationAccountId = destinationAccountId;
     }
 
     public void UpdateDetails(decimal amount, int termInMonths,
@@ -52,5 +58,11 @@ public class Loan
         if (status == RequestStatus.Pending) return;
         
         Status = status;
+    }
+
+    public void AddLoanAccount(UserAccount loanAccount)
+    {
+        LoanAccountId = loanAccount.Id;
+        LoanAccount = loanAccount;
     }
 }

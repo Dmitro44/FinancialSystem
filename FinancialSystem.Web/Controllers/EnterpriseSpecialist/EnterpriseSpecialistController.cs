@@ -125,4 +125,28 @@ public class EnterpriseSpecialistController : BaseController
 
         return RedirectToAction("SalaryProjects", "EnterpriseSpecialist", new { bankId = model.BankId });
     }
+
+    [HttpPost("ProcessProjects/{bankId}/{salaryProjectId}")]
+    public async Task<IActionResult> ProcessSalaryPayments(int bankId, int salaryProjectId)
+    {
+        var result = await _salaryProjectService.ProcessSalaryPaymentsAsync(salaryProjectId);
+        
+        if (result.Success)
+        {
+            TempData["SuccessMessage"] = "Заработная плата успешно выплачена";
+        }
+        else
+        {
+            TempData["ErrorMessage"] = "Произошли ошибки при выплате заработной платы";
+        }
+    
+        TempData["PaymentStats"] = $"Сумма: {result.TotalAmount}, Сотрудников: {result.EmployeesCount}, Успешно: {result.SuccessfulPayments}, Ошибок: {result.FailedPayments}";
+    
+        if (result.Errors.Any())
+        {
+            TempData["PaymentErrors"] = string.Join("<br>", result.Errors);
+        }
+        
+        return RedirectToAction("SalaryProjects", "EnterpriseSpecialist", new { bankId });
+    }
 }

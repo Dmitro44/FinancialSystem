@@ -1,45 +1,92 @@
 using FinancialSystem.Application.DTOs;
 using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
+using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace FinancialSystem.Application.Services;
 
 public class UserAccountService : IUserAccountService
 {
-    private readonly IUserAccountRepository _userAccountRepository;
+    private readonly IAccountRepository _accountRepository;
     private readonly IUserRepository _userRepository;
     private readonly IBankRepository _bankRepository;
+    private readonly ILogger<UserAccountService> _logger;
 
     public UserAccountService(IUserRepository userRepository, IBankRepository bankRepository,
-        IUserAccountRepository userAccountRepository)
+        IAccountRepository accountRepository, ILogger<UserAccountService> logger)
     {
         _userRepository = userRepository;
         _bankRepository = bankRepository;
-        _userAccountRepository = userAccountRepository;
+        _accountRepository = accountRepository;
+        _logger = logger;
     }
 
-    public async Task CreateAccountAsync(UserAccountDto dto)
+    public async Task<UserAccount?> CreateUserAccountAsync(UserAccountDto dto)
     {
-        var user = await _userRepository.GetByIdAsync(dto.OwnerId);
-        var bank = await _bankRepository.GetByIdAsync(dto.BankId);
-        if (user == null)
-        {
-            throw new ApplicationException($"User with id: {dto.OwnerId} does not exist.");
-        }
+        _logger.LogInformation("Starting creation of user account for user {UserId} in bank {BankId} with initial balance {Balance} and type {AccountType}",
+            dto.OwnerId, dto.BankId, dto.Balance, dto.AccountType);
 
-        if (bank == null)
+        try
         {
-            throw new ApplicationException($"Bank with id: {dto.BankId} does not exist.");
+            var user = await _userRepository.GetByIdAsync(dto.OwnerId);
+            var bank = await _bankRepository.GetByIdAsync(dto.BankId);
+            if (user == null)
+            {
+                _logger.LogWarning("Failed to create user account: user with ID {UserId} not found", 
+                    dto.OwnerId);
+                throw new ApplicationException($"User with id: {dto.OwnerId} does not exist.");
+            }
+
+            if (bank == null)
+            {
+                _logger.LogWarning("Failed to create user account: bank with ID {BankId} not found", 
+                    dto.BankId);
+                throw new ApplicationException($"Bank with id: {dto.BankId} does not exist.");
+            }
+        
+            var account = new UserAccount(user, dto.Balance, bank, dto.AccountType);
+
+            if (dto.AccountType == AccountType.Salary)
+            {
+                account.SetEmployer(dto.EmployerEnterprise);
+            }
+        
+            await _accountRepository.AddAsync(account);
+
+            _logger.LogInformation("User account successfully created for user {UserId} in bank {BankId} with ID {AccountId}", 
+                dto.OwnerId, dto.BankId, account.Id);
+        
+            return account;
         }
-        
-        var account = new UserAccount(user, dto.Balance, bank);
-        
-        await _userAccountRepository.AddAsync(account);
+        catch (Exception e) when (!(e is ApplicationException))
+        {
+            _logger.LogError(e, "Error creating user account for user {UserId} in bank {BankId}", 
+                dto.OwnerId, dto.BankId);
+            throw;
+        }
     }
 
     public async Task<IEnumerable<UserAccount>> FetchUserAccountsByBankAsync(int userId, int bankId)
     {
-        return await _userAccountRepository.GetUserAccountsByBankAsync(userId, bankId);
+        _logger.LogInformation("Fetching user accounts for user {UserId} in bank {BankId}", 
+            userId, bankId);
+        
+        try
+        {
+            var accounts =  await _accountRepository.GetUserAccountsByBankAsync(userId, bankId);
+            
+            _logger.LogInformation("Successfully fetched accounts for user {UserId} in bank {BankId}", 
+                userId, bankId);
+            
+            return accounts;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error fetching accounts for user {UserId} in bank {BankId}", 
+                userId, bankId);
+            throw;
+        }
     }
 }

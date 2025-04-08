@@ -6,6 +6,43 @@
 }
 
 <div class="container mt-4">
+    
+    <!-- Блок отображения результатов выплаты зарплаты -->
+    @if (TempData["SuccessMessage"] != null || TempData["ErrorMessage"] != null)
+    {
+        <div class="alert @(TempData["SuccessMessage"] != null ? "alert-success" : "alert-danger") alert-dismissible fade show mt-3 mb-3" role="alert">
+            <h4 class="alert-heading">
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+                }
+                else
+                {
+                    <i class="bi bi-exclamation-triangle-fill"></i> @TempData["ErrorMessage"]
+                }
+            </h4>
+        
+            @if (TempData["PaymentStats"] != null)
+            {
+                <p>@TempData["PaymentStats"]</p>
+            }
+        
+            @if (TempData["PaymentErrors"] != null)
+            {
+                <hr>
+                <p class="mb-0">Ошибки:</p>
+                <ul>
+                    @foreach (var error in ((string)TempData["PaymentErrors"]).Split("<br>"))
+                    {
+                        <li>@Html.Raw(error)</li>
+                    }
+                </ul>
+            }
+        
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    
     <h2 class="mb-4">Enterprise: @Model.EnterpriseName</h2>
     <p><strong>UNP:</strong> @Model.EnterpriseUnp</p>
     <p><strong>Type:</strong> @Model.EnterpriseType</p>
@@ -36,7 +73,12 @@
                                             <h5 class="card-title">Salary Project № @project.Id</h5>
                                             <p class="card-text">Salary: <strong>@project.Salary</strong></p>
                                             <p class="card-text"><small class="text-muted">Created: @project.CreatedAt.ToShortDateString()</small></p>
-                                            <a href="@Url.Action("SalaryProjectDetails", "EnterpriseSpecialist", new { id = project.Id })" class="btn btn-success">Details</a>
+                                            <div class="d-flex justify-content-between">
+                                                <a href="@Url.Action("SalaryProjectDetails", "EnterpriseSpecialist", new { id = project.Id })" class="btn btn-success">Details</a>
+                                                <form asp-controller="EnterpriseSpecialist" asp-action="ProcessSalaryPayments" asp-route-bankId="@Model.BankId" asp-route-salaryProjectId="@project.Id" method="post">
+                                                    <button type="submit" class="btn btn-primary">💸 Pay salaries</button>
+                                                </form>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

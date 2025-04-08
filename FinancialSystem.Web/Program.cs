@@ -5,6 +5,8 @@ using FinancialSystem.Domain.Interfaces;
 using FinancialSystem.Infrastructure.Data;
 using FinancialSystem.Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Events;
 
 namespace FinancialSystem.Web;
 
@@ -13,6 +15,18 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+            .WriteTo.Console()
+            .WriteTo.File("logs/financial-system-logs.txt",
+                rollingInterval: RollingInterval.Day,
+                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+            .CreateLogger();
+        
+        builder.Host.UseSerilog();
 
         // Add services to the container.
         builder.Services.AddControllersWithViews();
@@ -26,11 +40,9 @@ public class Program
         builder.Services.AddScoped<IEnterpriseService, EnterpriseService>();
         builder.Services.AddScoped<IEnterpriseRepository, EnterpriseRepository>();
         
+        builder.Services.AddScoped<IAccountRepository, AccountRepository>();
         builder.Services.AddScoped<IUserAccountService, UserAccountService>();
-        builder.Services.AddScoped<IUserAccountRepository, UserAccountRepository>();
-        
         builder.Services.AddScoped<IEnterpriseAccountService, EnterpriseAccountService>();
-        builder.Services.AddScoped<IEnterpriseAccountRepository, EnterpriseAccountRepository>();
         
         builder.Services.AddScoped<ILoanService, LoanService>();
         builder.Services.AddScoped<ILoanRepository, LoanRepository>();

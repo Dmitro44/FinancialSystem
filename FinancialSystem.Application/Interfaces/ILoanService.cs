@@ -7,9 +7,9 @@ namespace FinancialSystem.Application.Interfaces;
 public interface ILoanService
 {
     Task CreateLoanAsync(LoanDto dto);
+    Task AddLoanAccount(int loanId);
+    Task SendLoanAmount(int loanId);
     Task<IEnumerable<Loan>> FetchUserLoansByBankAsync(int userId, int bankId);
     Task<IEnumerable<Loan>> FetchLoansByBankAsync(int bankId);
-    // Task<Loan?> GetLoanByIdAsync(int loanId);
-    // Task UpdateLoanAsync(Loan loan);
     Task UpdateStatusAsync(int loanId, RequestStatus newStatus);
 }

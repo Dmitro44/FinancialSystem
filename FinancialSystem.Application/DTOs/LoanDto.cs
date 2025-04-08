@@ -9,4 +9,6 @@ public class LoanDto
     public decimal InterestRate { get; set; }
     public decimal TotalAmount { get; set; }
     public decimal MonthlyPayment { get; set; }
+
+    public int DestinationAccountId { get; set; }
 }

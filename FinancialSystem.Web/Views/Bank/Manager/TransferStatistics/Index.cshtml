@@ -1,0 +1,80 @@
+@using FinancialSystem.Domain.Enums
+@model FinancialSystem.Web.Models.Operator.TransferStatisticsViewModel
+
+@{
+    ViewData["Title"] = "Transfer Statistics";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">📊 Transaction Statistics</h2>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="alert alert-danger">
+            @Model.ErrorMessage
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-success">
+            @Model.SuccessMessage
+        </div>
+    }
+    
+    <div class="row">
+        @foreach (var transfer in Model.TransfersFromBank)
+        {
+            string cardClass = transfer.Status switch
+            {
+                TransferStatus.Canceled => "bg-light text-muted",
+                TransferStatus.Active => "border-success",
+                TransferStatus.Revert => "border-info",
+                _ => "border-secondary"
+            };
+            
+            <div class="col-md-6 mb-3">
+                <div class="card @cardClass">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            🔄 Transfer ID: @transfer.Id 
+                            @switch (transfer.Status)
+                            {
+                                case TransferStatus.Active:
+                                    <span class="badge bg-success">Active</span>
+                                    break;
+                                case TransferStatus.Canceled:
+                                    <span class="badge bg-secondary">Canceled</span>
+                                    break;
+                                case TransferStatus.Revert:
+                                    <span class="badge bg-info">Revert</span>
+                                    break;
+                            }
+                            
+                            @switch (transfer.Type)
+                            {
+                                case TransferType.Salary:
+                                    <span class="badge bg-primary">Salary</span>
+                                    break;
+                                case TransferType.Regular:
+                                    <span class="badge bg-dark">Regular</span>
+                                    break;
+                            }
+                        </h5>
+                        <p class="card-text"><strong>From:</strong> Account № @transfer.SenderId</p>
+                        <p class="card-text"><strong>To:</strong> Account № @transfer.ReceiverId</p>
+                        <p class="card-text"><strong>Amount:</strong> @transfer.Amount $</p>
+                        <p class="card-text"><strong>Date:</strong> @transfer.TransferDate.ToString("yyyy-MM-dd HH:mm")</p>
+
+                        @if (transfer.Status == TransferStatus.Active)
+                        {
+                            <form asp-action="CancelTransfer" asp-controller="Manager" method="post" asp-route-transferId="@transfer.Id">
+                                <button type="submit" class="btn btn-danger">⏪ Cancel Transfer</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

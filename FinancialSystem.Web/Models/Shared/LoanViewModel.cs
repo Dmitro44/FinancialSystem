@@ -1,3 +1,5 @@
+using FinancialSystem.Domain.Entities;
+
 namespace FinancialSystem.Web.Models.Shared;
 
 public class LoanViewModel
@@ -8,4 +10,8 @@ public class LoanViewModel
     public int TermInMonths { get; set; }
     public decimal TotalAmount { get; set; }
     public decimal MonthlyPayment { get; set; }
+
+    public int DestinationAccountId { get; set; }
+    
+    public List<UserAccount> UserAccounts { get; set; }
 }

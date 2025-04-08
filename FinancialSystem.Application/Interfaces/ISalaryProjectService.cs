@@ -12,5 +12,7 @@ public interface ISalaryProjectService
     Task UpdateStatusAsync(int salaryProjectId, SalaryProjectStatus status);
     Task<List<SalaryProject>> GetAvailableSalaryProjectsForUserAsync(int userId, int bankId);
     Task ConnectUserToSalaryProject(int userId, int salaryProjectId);
-    Task<List<SalaryProjectEmployee>> GetUserSalaryProjectsAsync(int userId);
+    Task<(bool success, string message)> DisconnectUserFromSalaryProject(int userId, int salaryProjectId);
+    Task<List<SalaryProjectEmployee>> GetUserSalaryProjectsAsync(int userId, int bankId);
+    Task<SalaryPaymentResultDto> ProcessSalaryPaymentsAsync(int salaryProjectId);
 }

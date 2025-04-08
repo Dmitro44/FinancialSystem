@@ -9,5 +9,6 @@ public interface ISalaryProjectEmployeeRepository
     Task UpdateAsync(SalaryProjectEmployee salaryProjectEmployee);
     Task DeleteAsync(int salaryProjectEmployeeId);
     Task<SalaryProjectEmployee?> GetProjectByUserAndProjectIdAsync(int userId, int salaryProjectId);
-    Task<IEnumerable<SalaryProjectEmployee>> GetByUserIdAsync(int userId);
+    Task<IEnumerable<SalaryProjectEmployee>> GetByUserAndBankIdAsync(int userId, int bankId);
+    Task<IEnumerable<SalaryProjectEmployee>> GetByProjectIdAsync(int projectId);
 }

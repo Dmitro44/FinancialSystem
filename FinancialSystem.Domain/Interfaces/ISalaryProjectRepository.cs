@@ -6,6 +6,7 @@ namespace FinancialSystem.Domain.Interfaces;
 public interface ISalaryProjectRepository
 {
     Task<SalaryProject?> GetByIdAsync(int projectId);
+    Task<SalaryProject?> GetByIdWithDetailsAsync(int projectId);
     Task AddAsync(SalaryProject salaryProject);
     Task UpdateStatusAsync(int projectId, SalaryProjectStatus status);
     Task DeleteAsync(int projectId);

@@ -36,7 +36,8 @@ public class ClientController : BaseController
         {
             Balance = model.Balance,
             BankId = model.BankId,
-            OwnerId = currentUserId
+            OwnerId = currentUserId,
+            AccountType = AccountType.Standard
         };
         
         await _bankService.CreateAccountAsync(accountDto);
@@ -57,7 +58,8 @@ public class ClientController : BaseController
             TermInMonths = model.TermInMonths,
             TotalAmount = model.TotalAmount,
             MonthlyPayment = model.MonthlyPayment,
-            UserId = currentUserId
+            UserId = currentUserId,
+            DestinationAccountId = model.DestinationAccountId
         };
         
         await _bankService.CreateLoanAsync(loanDto);
@@ -75,7 +77,8 @@ public class ClientController : BaseController
             Amount = model.Amount,
             BankId = model.BankId,
             TermInMonths = model.TermInMonths,
-            UserId = currentUserId
+            UserId = currentUserId,
+            DestinationAccountId = model.DestinationAccountId
         };
         
         await _bankService.CreateInstallmentAsync(installmentDto);
@@ -110,7 +113,8 @@ public class ClientController : BaseController
             Amount = model.Amount,
             ReceiverId = model.ReceiverId,
             SenderId = model.SenderId,
-            Status = TransferStatus.Active
+            Status = TransferStatus.Active,
+            Type = TransferType.Regular
         };
 
         try
@@ -131,12 +135,14 @@ public class ClientController : BaseController
     {
         var currentUserId = GetCurrentUserId();
         var availableProjects = await _salaryProjectService.GetAvailableSalaryProjectsForUserAsync(currentUserId, bankId);
-        var connectedProjects = await _salaryProjectService.GetUserSalaryProjectsAsync(currentUserId);
+        var connectedProjects = await _salaryProjectService.GetUserSalaryProjectsAsync(currentUserId, bankId);
 
         var model = new ClientSalaryProjectViewModel
         {
             AvailableSalaryProjects = availableProjects,
-            ConnectedSalaryProjects = connectedProjects
+            ConnectedSalaryProjects = connectedProjects,
+            SuccessMessage = TempData["SuccessMessage"]?.ToString(),
+            ErrorMessage = TempData["ErrorMessage"]?.ToString()
         };
         
         return View("~/Views/Bank/Client/SalaryProject/Index.cshtml", model);
@@ -147,6 +153,24 @@ public class ClientController : BaseController
     {
         var currentUserId = GetCurrentUserId();
         await _salaryProjectService.ConnectUserToSalaryProject(currentUserId, salaryProjectId);
+        return RedirectToAction("PrepareAvailableSalaryProjects", "Client", new { bankId });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DisconnectFromSalaryProject(int salaryProjectId, int bankId)
+    {
+        var currentUserId = GetCurrentUserId();
+        var result = await _salaryProjectService.DisconnectUserFromSalaryProject(currentUserId, salaryProjectId);
+
+        if (result.success)
+        {
+            TempData["SuccessMessage"] = result.message;
+        }
+        else
+        {
+            TempData["ErrorMessage"] = result.message;
+        }
+        
         return RedirectToAction("PrepareAvailableSalaryProjects", "Client", new { bankId });
     }
 }
