@@ -37,4 +37,8 @@
       <AdditionalFiles Include="Views\Bank\Client\Finances\Partials\_CreateLoan.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="logs\" />
+    </ItemGroup>
+
 </Project>

@@ -9,4 +9,6 @@ public class TransferDto
     public decimal Amount { get; set; }
     public TransferStatus Status { get; set; }
     public TransferType Type { get; set; }
+
+    public bool IsSenderCreditAccount { get; set; }
 }

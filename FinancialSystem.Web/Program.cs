@@ -2,6 +2,7 @@ using FinancialSystem.Application.Configuration;
 using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Application.Services;
 using FinancialSystem.Domain.Interfaces;
+using FinancialSystem.Domain.Operations;
 using FinancialSystem.Infrastructure.Data;
 using FinancialSystem.Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +19,9 @@ public class Program
         
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Information()
-            .MinimumLevel.Override("Microsoft.EntityFrameworkCore.Database.Command", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
             .WriteTo.Console()
             .WriteTo.File("logs/financial-system-logs.txt",
-                rollingInterval: RollingInterval.Day,
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
             .CreateLogger();
         
@@ -59,6 +58,9 @@ public class Program
         builder.Services.AddScoped<IUserEnterpriseRepository, UserEnterpriseRepository>();
 
         builder.Services.AddScoped<ISalaryProjectEmployeeRepository, SalaryProjectEmployeeRepository>();
+
+        builder.Services.AddScoped<OperationService>();
+        builder.Services.AddScoped<IOperationLogRepository, OperationLogRepository>();
 
         builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.Configure<AuthSettings>(builder.Configuration.GetSection("AuthSettings"));

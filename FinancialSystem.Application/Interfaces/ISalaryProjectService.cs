@@ -15,4 +15,6 @@ public interface ISalaryProjectService
     Task<(bool success, string message)> DisconnectUserFromSalaryProject(int userId, int salaryProjectId);
     Task<List<SalaryProjectEmployee>> GetUserSalaryProjectsAsync(int userId, int bankId);
     Task<SalaryPaymentResultDto> ProcessSalaryPaymentsAsync(int salaryProjectId);
+    Task<bool> RevertSalaryProjectCreationAsync(int salaryProjectId);
+    Task<bool> RestoreSalaryProjectCreationAsync(int salaryProjectId);
 }

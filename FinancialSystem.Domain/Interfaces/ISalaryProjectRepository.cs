@@ -9,6 +9,7 @@ public interface ISalaryProjectRepository
     Task<SalaryProject?> GetByIdWithDetailsAsync(int projectId);
     Task AddAsync(SalaryProject salaryProject);
     Task UpdateStatusAsync(int projectId, SalaryProjectStatus status);
+    Task UpdateAsync(SalaryProject salaryProject);
     Task DeleteAsync(int projectId);
     Task<IEnumerable<SalaryProject>> GetApprovedSalaryProjectsByBankAsync(int enterpriseId, int bankId);
     Task<IEnumerable<SalaryProject>> GetAllSalaryProjectsByBankAsync(int bankId);

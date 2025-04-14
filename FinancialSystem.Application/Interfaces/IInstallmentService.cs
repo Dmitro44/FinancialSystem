@@ -12,4 +12,6 @@ public interface IInstallmentService
     Task<IEnumerable<Installment>> FetchUserInstallmentsByBankAsync(int userId, int bankId);
     Task<IEnumerable<Installment>> FetchInstallmentsByBankAsync(int bankId);
     Task UpdateStatusAsync(int installmentId, RequestStatus newStatus);
+    Task<bool> RevertInstallmentCreationAsync(int installmentId);
+    Task<bool> RestoreInstallmentCreationAsync(int installmentId);
 }

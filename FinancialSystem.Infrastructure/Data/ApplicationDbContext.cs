@@ -1,5 +1,6 @@
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Enums;
+using FinancialSystem.Domain.Operations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 
@@ -15,7 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Bank> Banks { get; set; }
     public DbSet<Account> Accounts { get; set; }
-    public DbSet<UserAccount?> UserAccounts { get; set; }
+    public DbSet<UserAccount> UserAccounts { get; set; }
     public DbSet<EnterpriseAccount> EnterpriseAccounts { get; set; }
     public DbSet<Enterprise> Enterprises  { get; set; }
     public DbSet<Installment> Installments { get; set; }
@@ -25,6 +26,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<UserBankRole> UserBankRoles { get; set; }
     public DbSet<UserEnterprise> UserEnterprises { get; set; }
     public DbSet<SalaryProjectEmployee> SalaryProjectEmployees { get; set; }
+    public DbSet<OperationLog> OperationLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

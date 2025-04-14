@@ -10,23 +10,26 @@ namespace FinancialSystem.Application.Services;
 public class InstallmentService : IInstallmentService
 {
     private readonly IUserRepository _userRepository;
-    private readonly IAccountRepository _accountRepository;
+    
     private readonly IUserAccountService _userAccountService;
+    private readonly IAccountRepository _accountRepository;
+    private readonly ITransferService _transferService;
     private readonly IBankRepository _bankRepository;
     private readonly IInstallmentRepository _installmentRepository;
     private readonly ILogger<InstallmentService> _logger;
 
     public InstallmentService(IUserRepository userRepository, IBankRepository bankRepository,
-        IInstallmentRepository installmentRepository, ILogger<InstallmentService> logger, IUserAccountService userAccountService, IAccountRepository accountRepository)
+        IInstallmentRepository installmentRepository, ILogger<InstallmentService> logger, IUserAccountService userAccountService, ITransferService transferService, IAccountRepository accountRepository)
     {
         _userRepository = userRepository;
         _bankRepository = bankRepository;
         _installmentRepository = installmentRepository;
         _logger = logger;
         _userAccountService = userAccountService;
+        _transferService = transferService;
         _accountRepository = accountRepository;
     }
-
+    
     public async Task CreateInstallmentAsync(InstallmentDto dto)
     {
         _logger.LogInformation("Starting creation of installment for user {UserId} in bank {BankId} with amount {Amount} for {Term} months",
@@ -72,7 +75,7 @@ public class InstallmentService : IInstallmentService
         {
             OwnerId = installment.PayerId,
             BankId = installment.BankId,
-            Balance = -installment.Amount,
+            Balance = 0,
             AccountType = AccountType.Credit
         };
 
@@ -97,17 +100,15 @@ public class InstallmentService : IInstallmentService
             throw new ApplicationException($"Installment with ID {installmentId} not found");
         }
 
-        var destinationAccount = await _accountRepository.GetByIdAsync(installment.DestinationAccountId);
-        if (destinationAccount == null)
+        var transferDto = new TransferDto
         {
-            _logger.LogWarning("Failed to send installment amount: destination account with ID {DestAccountId} not found",
-                installment.DestinationAccountId);
-            throw new ApplicationException($"Destination account with ID {installment.DestinationAccountId} not found");
-        }
-        
-        destinationAccount.Deposit(installment.Amount);
-        
-        await _accountRepository.UpdateAsync(destinationAccount);
+            SenderId = installment.InstallmentAccountId.Value,
+            ReceiverId = installment.DestinationAccountId,
+            Amount = installment.Amount,
+            IsSenderCreditAccount = true
+        };
+
+        await _transferService.CreateTransferAsync(transferDto);
     }
 
     public async Task<IEnumerable<Installment>> FetchUserInstallmentsByBankAsync(int userId, int bankId)
@@ -165,6 +166,105 @@ public class InstallmentService : IInstallmentService
         {
             _logger.LogError(e, "Error updating status of installment {InstallmentId} to {NewStatus}", installmentId, newStatus);
             throw;
+        }
+    }
+
+    public async Task<bool> RevertInstallmentCreationAsync(int installmentId)
+    {
+        _logger.LogInformation("Reverting installment creation for installment {InstallmentId}",
+            installmentId);
+
+        var installment = await _installmentRepository.GetByIdAsync(installmentId);
+        if (installment == null || installment.Status != RequestStatus.Approved)
+        {
+            _logger.LogWarning("Cannot revert installment creation: installment {InstallmentId} not found or not approved",
+                installmentId);
+            return false;
+        }
+
+        try
+        {
+            await _installmentRepository.UpdateStatusAsync(installmentId, RequestStatus.Rejected);
+
+            if (installment.InstallmentAccountId.HasValue)
+            {
+                var installmentAccount = await _accountRepository.GetByIdAsync(installment.InstallmentAccountId.Value);
+                if (installmentAccount != null)
+                {
+                    var destinationAccount = await _accountRepository.GetByIdAsync(installment.DestinationAccountId);
+                    if (destinationAccount != null && destinationAccount.Balance >= installment.Amount)
+                    {
+                        await _transferService.CreateTransferAsync(new TransferDto
+                        {
+                            SenderId = installment.DestinationAccountId,
+                            ReceiverId = installment.InstallmentAccountId.Value,
+                            Amount = installment.Amount,
+                            IsSenderCreditAccount = true
+                        });
+                    }
+                    
+                    installmentAccount.Deactivate();
+                    await _accountRepository.UpdateAsync(installmentAccount);
+                }
+            }
+        
+            _logger.LogInformation("Successfully reverted installment creation for installment {InstallmentId}",
+                installmentId);
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error reverting installment creation for installment {InstallmentId}",
+                installmentId);
+            return false;
+        }
+    }
+
+    public async Task<bool> RestoreInstallmentCreationAsync(int installmentId)
+    {
+        _logger.LogInformation("Restoration installment creation for installment {InstallmentId}",
+            installmentId);
+        
+        var installment = await _installmentRepository.GetByIdAsync(installmentId);
+        if (installment == null)
+        {
+            _logger.LogWarning("Cannot restore installment creation: installment {InstallmentId} not found",
+                installmentId);
+            return false;
+        }
+
+        try
+        {
+            await _installmentRepository.UpdateStatusAsync(installmentId, RequestStatus.Approved);
+
+            if (installment.InstallmentAccountId.HasValue)
+            {
+                var installmentAccount = await _accountRepository.GetByIdAsync(installment.InstallmentAccountId.Value);
+                if (installmentAccount != null)
+                {
+                    installmentAccount.Activate();
+                    await _accountRepository.UpdateAsync(installmentAccount);
+
+                    await _transferService.CreateTransferAsync(new TransferDto
+                    {
+                        SenderId = installment.InstallmentAccountId.Value,
+                        ReceiverId = installment.DestinationAccountId,
+                        Amount = installment.Amount,
+                        Type = TransferType.Regular,
+                        IsSenderCreditAccount = true
+                    });
+                }
+            }
+        
+            _logger.LogInformation("Successfully restored installment creation for installment {InstallmentId}",
+                installmentId);
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error restoring installment creation for installment {InstallmentId}",
+                installmentId);
+            return false;
         }
     }
 }

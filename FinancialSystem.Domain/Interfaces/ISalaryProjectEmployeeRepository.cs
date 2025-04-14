@@ -11,4 +11,6 @@ public interface ISalaryProjectEmployeeRepository
     Task<SalaryProjectEmployee?> GetProjectByUserAndProjectIdAsync(int userId, int salaryProjectId);
     Task<IEnumerable<SalaryProjectEmployee>> GetByUserAndBankIdAsync(int userId, int bankId);
     Task<IEnumerable<SalaryProjectEmployee>> GetByProjectIdAsync(int projectId);
+    Task<IEnumerable<SalaryProjectEmployee>> GetArchivedByProjectIdAsync(int salaryProjectId);
+    Task RestoreAsync(int employeeId);
 }

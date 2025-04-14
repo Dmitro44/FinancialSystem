@@ -134,4 +134,14 @@ public class UserService : IUserService
             throw;
         }
     }
+
+    public Task<bool> RevertUserCreation(int userId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<bool> RestoreUserCreationAsync(int userId)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -12,4 +12,6 @@ public interface ILoanService
     Task<IEnumerable<Loan>> FetchUserLoansByBankAsync(int userId, int bankId);
     Task<IEnumerable<Loan>> FetchLoansByBankAsync(int bankId);
     Task UpdateStatusAsync(int loanId, RequestStatus newStatus);
+    Task<bool> RevertLoanCreationAsync(int logEntityId);
+    Task<bool> RestoreLoanCreationAsync(int loanId);
 }

@@ -3,7 +3,6 @@ using FinancialSystem.Application.Interfaces;
 using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 
 namespace FinancialSystem.Application.Services;
@@ -444,5 +443,103 @@ public class SalaryProjectService : ISalaryProjectService
         }
         
         return result;
+    }
+
+    public async Task<bool> RevertSalaryProjectCreationAsync(int salaryProjectId)
+    {
+        _logger.LogInformation("Reverting salary project {ProjectId} creation",
+            salaryProjectId);
+
+        try
+        {
+            var salaryProject = await _salaryProjectRepository.GetByIdAsync(salaryProjectId);
+            if (salaryProject == null || salaryProject.Status != SalaryProjectStatus.Approved)
+            {
+                _logger.LogWarning("Cannot revert salary project creation: project {ProjectId} not found or not approved",
+                    salaryProjectId);
+                return false;
+            }
+
+            var salaryProjectEmployee = await _salaryProjectEmployeeRepository.GetByProjectIdAsync(salaryProjectId);
+            foreach (var employee in salaryProjectEmployee)
+            {
+                var userAccount = await _accountRepository.GetByIdAsync(employee.UserAccountId);
+                if (userAccount != null)
+                {
+                    userAccount.Deactivate();
+                    await _accountRepository.UpdateAsync(userAccount);
+                }
+
+                employee.Deactivate();
+                await _salaryProjectEmployeeRepository.UpdateAsync(employee);
+            }
+            
+            salaryProject.Deactivate();
+            await _salaryProjectRepository.UpdateAsync(salaryProject);
+        
+            _logger.LogInformation("Successfully reverted salary project {ProjectId} creation",
+                salaryProjectId);
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error reverting salary project {ProjectId} creation",
+                salaryProjectId);
+            return false;
+        }
+    }
+
+    public async Task<bool> RestoreSalaryProjectCreationAsync(int salaryProjectId)
+    {
+        _logger.LogInformation("Restoring salary project {ProjectId} creation",
+            salaryProjectId);
+
+        try
+        {
+            var salaryProject = await _salaryProjectRepository.GetByIdAsync(salaryProjectId);
+            if (salaryProject == null)
+            {
+                _logger.LogWarning("Cannot restore salary project: project {ProjectId} not found",
+                    salaryProjectId);
+                return false;
+            }
+
+            if (salaryProject.IsActive)
+            {
+                _logger.LogWarning("Salary project {ProjectId} is already active",
+                    salaryProjectId);
+                return true;
+            }
+        
+            salaryProject.Activate();
+            await _salaryProjectRepository.UpdateAsync(salaryProject);
+        
+            var archivedEmployees = await _salaryProjectEmployeeRepository.GetArchivedByProjectIdAsync(salaryProjectId);
+
+            foreach (var employee in archivedEmployees)
+            {
+                await _salaryProjectEmployeeRepository.RestoreAsync(employee.Id);
+            
+                var userAccount = await _accountRepository.GetByIdAsync(employee.UserAccountId);
+                if (userAccount != null)
+                {
+                    userAccount.Activate();
+                    await _accountRepository.UpdateAsync(userAccount);
+                
+                    _logger.LogInformation("Activated salary account {AccountId} for employee {EmployeeId} in salary project {ProjectId}",
+                        userAccount.Id, employee.UserId, salaryProject.Id);
+                }
+            }
+        
+            _logger.LogInformation("Successfully restored salary project {ProjectId}",
+                salaryProject.Id);
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error restoring salary project {ProjectId}",
+                salaryProjectId);
+            return false;
+        }
     }
 }

@@ -14,6 +14,7 @@ public class SalaryProject
     public decimal Salary { get; private set; }
     public int BankId { get; private set; }
     public Bank Bank { get; private set; }
+    public bool IsActive { get; private set; }
 
     public List<SalaryProjectEmployee> Employees { get; private set; } = new();
     
@@ -31,6 +32,12 @@ public class SalaryProject
         Salary = salary;
         Bank = bank;
         BankId = bank.Id;
+        IsActive = true;
+    }
+
+    public void UpdateDetails(decimal salary)
+    {
+        Salary = salary;
     }
 
     public void SetStatus(SalaryProjectStatus status)
@@ -38,5 +45,15 @@ public class SalaryProject
         if (status == SalaryProjectStatus.Pending) return;
         
         Status = status;
+    }
+
+    public void Activate()
+    {
+        IsActive = true;
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
     }
 }

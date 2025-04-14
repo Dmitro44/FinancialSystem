@@ -3,6 +3,7 @@ using System;
 using FinancialSystem.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FinancialSystem.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250408212341_RevertNullableLoanAccountId")]
+    partial class RevertNullableLoanAccountId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -228,9 +231,6 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.Property<int>("EnterpriseId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
                     b.Property<decimal>("Salary")
                         .HasColumnType("numeric");
 
@@ -255,9 +255,6 @@ namespace FinancialSystem.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
 
                     b.Property<DateTime>("JoinDate")
                         .HasColumnType("timestamp with time zone");
@@ -421,47 +418,6 @@ namespace FinancialSystem.Infrastructure.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserEnterprises");
-                });
-
-            modelBuilder.Entity("FinancialSystem.Domain.Operations.OperationLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BankId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("text");
-
-                    b.Property<int>("EntityId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("OperationType")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int?>("OriginalLogId")
-                        .HasColumnType("integer");
-
-                    b.Property<int?>("ReversalLogId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("OperationLogs");
                 });
 
             modelBuilder.Entity("FinancialSystem.Domain.Entities.EnterpriseAccount", b =>

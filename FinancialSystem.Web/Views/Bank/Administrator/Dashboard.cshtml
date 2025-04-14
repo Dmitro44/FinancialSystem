@@ -1,0 +1,26 @@
+@{
+    ViewData["Title"] = "Administrator Dashboard";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Bank Administrator Dashboard</h2>
+
+    <div class="row">
+        <!-- Управление операциями - единственная карточка -->
+        <div class="col-md-6 mx-auto">
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">🔄 Operations Management</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        View, cancel and restore operations in this bank.
+                    </p>
+                    <a href="@Url.Action("ShowOperations", "Admin", new { bankId = ViewBag.BankId })" class="btn btn-primary btn-lg w-100">
+                        Manage Operations
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

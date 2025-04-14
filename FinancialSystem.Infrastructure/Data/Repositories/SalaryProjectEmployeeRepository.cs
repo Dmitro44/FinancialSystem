@@ -26,7 +26,13 @@ public class SalaryProjectEmployeeRepository : ISalaryProjectEmployeeRepository
 
     public async Task UpdateAsync(SalaryProjectEmployee salaryProjectEmployee)
     {
-        throw new NotImplementedException();
+        var speToUpdate = await _context.SalaryProjectEmployees.FindAsync(salaryProjectEmployee.Id);
+        if (speToUpdate == null)
+        {
+            throw new ArgumentNullException(nameof(speToUpdate));
+        }
+        
+        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int salaryProjectEmployeeId)
@@ -55,7 +61,7 @@ public class SalaryProjectEmployeeRepository : ISalaryProjectEmployeeRepository
                 .ThenInclude(s => s.Enterprise)
             .Include(spe => spe.SalaryProject)
                 .ThenInclude(s => s.Bank)
-            .Where(spe => spe.UserId == userId && spe.SalaryProject.BankId == bankId)
+            .Where(spe => spe.UserId == userId && spe.SalaryProject.BankId == bankId && spe.IsActive)
             .ToListAsync();
     }
 
@@ -63,7 +69,26 @@ public class SalaryProjectEmployeeRepository : ISalaryProjectEmployeeRepository
     {
         return await _context.SalaryProjectEmployees
             .Include(spe => spe.UserAccount)
-            .Where(spe => spe.SalaryProjectId == projectId)
+            .Where(spe => spe.SalaryProjectId == projectId && spe.IsActive)
             .ToListAsync();
+    }
+
+    public async Task<IEnumerable<SalaryProjectEmployee>> GetArchivedByProjectIdAsync(int salaryProjectId)
+    {
+        return await _context.SalaryProjectEmployees
+            .Where(spe => spe.SalaryProjectId == salaryProjectId && !spe.IsActive)
+            .ToListAsync();
+    }
+
+    public async Task RestoreAsync(int employeeId)
+    {
+        var employee = await _context.SalaryProjectEmployees.FindAsync(employeeId);
+        if (employee == null)
+        {
+            throw new ArgumentNullException(nameof(employee));
+        }
+        
+        employee.Activate();
+        await _context.SaveChangesAsync();
     }
 }

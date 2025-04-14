@@ -1,0 +1,154 @@
+@using FinancialSystem.Domain.Operations
+@model FinancialSystem.Web.Models.Administrator.OperationViewModel
+
+@{
+    ViewData["Title"] = "Operations History";
+}
+
+<h2>Operations History</h2>
+
+@if (TempData["OperationMessage"] != null)
+{
+    <div class="alert @(Convert.ToBoolean(TempData["OperationSuccess"]) ? "alert-success" : "alert-danger")">
+        @TempData["OperationMessage"]
+    </div>
+}
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Operation Type</th>
+            <th>Entity</th>
+            <th>User</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var operation in Model.Operations)
+        {
+            <tr>
+                <td>@operation.Id</td>
+                <td>
+                    @switch (operation.OperationType)
+                    {
+                        case "LoanApproval":
+                            <span>Loan Approval</span>
+                            break;
+                        case "InstallmentApproval":
+                            <span>Installment Approval</span>
+                            break;
+                        case "SalaryProjectCreation":
+                            <span>Salary Project Creation</span>
+                            break;
+                        case "UserRegistration":
+                            <span>User Registration</span>
+                            break;
+                        case var type when type.StartsWith("Reversal_"):
+                            <span>Reversal: @type.Replace("Reversal_", "")</span>
+                            break;
+                        case var type when type.StartsWith("Restoration_"):
+                            <span>Restoration: @type.Replace("Restoration_", "")</span>
+                            break;
+                        default:
+                            <span>@operation.OperationType</span>
+                            break;
+                    }
+                </td>
+                <td>@operation.EntityId</td>
+                <td>@operation.UserId</td>
+                <td>@operation.TimeStamp.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>
+                    @switch (operation.Status)
+                    {
+                        case OperationStatus.Active:
+                            <span class="badge bg-success">Active</span>
+                            break;
+                        case OperationStatus.Reverted:
+                            <span class="badge bg-warning">Reverted</span>
+                            break;
+                        case OperationStatus.Restored:
+                            <span class="badge bg-info">Restored</span>
+                            break;
+                        case OperationStatus.ReversalOperation:
+                            <span class="badge bg-secondary">Reversal Operation</span>
+                            break;
+                        case OperationStatus.RestorationOperation:
+                            <span class="badge bg-secondary">Restoration Operation</span>
+                            break;
+                    }
+                </td>
+                <td>
+                    @if (operation.Status == OperationStatus.Active)
+                    {
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#revertModal-@operation.Id">
+                            Revert
+                        </button>
+                    }
+                    else if (operation.Status == OperationStatus.Reverted)
+                    {
+                        <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#restoreModal-@operation.Id">
+                            Restore
+                        </button>
+                    }
+                </td>
+            </tr>
+            
+            <!-- Modal for reverting operation -->
+            <div class="modal fade" id="revertModal-@operation.Id" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form asp-action="RevertOperation" asp-controller="Admin" method="post">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Revert Operation #@operation.Id</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="BankId" name="BankId" value="@operation.BankId"/>
+                                <input type="hidden" id="LogId" name="LogId" value="@operation.Id"/>
+                                <div class="mb-3">
+                                    <label asp-for="Comment" class="form-label">Comment for reversion</label>
+                                    <textarea asp-for="Comment" class="form-control" required></textarea>
+                                </div>
+                                <p class="text-warning">Are you sure you want to revert this operation?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-warning">Revert Operation</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Modal for restoring operation -->
+            <div class="modal fade" id="restoreModal-@operation.Id" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <form asp-action="RestoreOperation" asp-controller="Admin" method="post">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Restore Operation #@operation.Id</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" name="BankId" value="@operation.BankId"/>
+                                <input type="hidden" name="LogId" value="@operation.Id"/>
+                                <div class="mb-3">
+                                    <label asp-for="Comment" class="form-label">Comment for restoration</label>
+                                    <textarea asp-for="Comment" class="form-control" required></textarea>
+                                </div>
+                                <p class="text-info">Are you sure you want to restore this operation (undo reversion)?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-info">Restore Operation</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </tbody>
+</table>

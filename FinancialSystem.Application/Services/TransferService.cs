@@ -57,7 +57,7 @@ public class TransferService : ITransferService
                 throw new InvalidOperationException("Cannot transfer to inactive account");
             }
 
-            if (senderAccount.Balance < dto.Amount)
+            if (senderAccount.Balance < dto.Amount && !dto.IsSenderCreditAccount)
             {
                 _logger.LogWarning("Insufficient balance for transfer: account {AccountId} has {Balance}, but {RequiredAmount} is needed", 
                     senderAccount.Id, senderAccount.Balance, dto.Amount);

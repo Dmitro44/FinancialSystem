@@ -4,6 +4,7 @@ using FinancialSystem.Domain.Entities;
 using FinancialSystem.Domain.Enums;
 using FinancialSystem.Domain.Interfaces;
 using Microsoft.Extensions.Logging;
+using ApplicationException = System.ApplicationException;
 
 namespace FinancialSystem.Application.Services;
 
@@ -12,12 +13,13 @@ public class LoanService : ILoanService
     private readonly ILoanRepository _loanRepository;
     private readonly IUserRepository _userRepository;
     private readonly IBankRepository _bankRepository;
+    private readonly ITransferService _transferService;
     private readonly IUserAccountService _userAccountService;
     private readonly IAccountRepository _accountRepository;
     private readonly ILogger<LoanService> _logger;
 
     public LoanService(IUserRepository userRepository, IBankRepository bankRepository,
-        ILoanRepository loanRepository, ILogger<LoanService> logger, IUserAccountService userAccountService, IAccountRepository accountRepository)
+        ILoanRepository loanRepository, ILogger<LoanService> logger, IUserAccountService userAccountService, IAccountRepository accountRepository, ITransferService transferService)
     {
         _userRepository = userRepository;
         _bankRepository = bankRepository;
@@ -25,6 +27,7 @@ public class LoanService : ILoanService
         _logger = logger;
         _userAccountService = userAccountService;
         _accountRepository = accountRepository;
+        _transferService = transferService;
     }
 
     public async Task CreateLoanAsync(LoanDto dto)
@@ -74,7 +77,7 @@ public class LoanService : ILoanService
         {
             OwnerId = loan.BorrowerId,
             BankId = loan.BankId,
-            Balance = -loan.TotalAmount,
+            Balance = 0,
             AccountType = AccountType.Credit
         };
 
@@ -98,18 +101,19 @@ public class LoanService : ILoanService
                 loanId);
             throw new ApplicationException($"Loan with ID {loanId} does not exist.");
         }
-        
-        var destinationAccount = await _accountRepository.GetByIdAsync(loan.DestinationAccountId);
-        if (destinationAccount == null)
+
+        var transferDto = new TransferDto
         {
-            _logger.LogWarning("Failed to send loan amount: destination account with ID {DestAccountId} not found",
-                loan.DestinationAccountId);
-            throw new ApplicationException($"Destination account with ID {loan.DestinationAccountId} does not exist.");
-        }
+            SenderId = loan.LoanAccountId.Value,
+            ReceiverId = loan.DestinationAccountId,
+            Amount = loan.TotalAmount,
+            Type = TransferType.Regular,
+            IsSenderCreditAccount = true
+        };
         
-        destinationAccount.Deposit(loan.Amount);
+        await _transferService.CreateTransferAsync(transferDto);
         
-        await _accountRepository.UpdateAsync(destinationAccount);
+        
     }
 
     public async Task<IEnumerable<Loan>> FetchUserLoansByBankAsync(int userId, int bankId)
@@ -164,6 +168,102 @@ public class LoanService : ILoanService
         {
             _logger.LogError(e, "Error updating status of loan {LoanId} to {NewStatus}", loanId, newStatus);
             throw;
+        }
+    }
+
+    public async Task<bool> RevertLoanCreationAsync(int loanId)
+    {
+        _logger.LogInformation("Reverting loan creation for loan {LoanID}",
+            loanId);
+        
+        var loan = await _loanRepository.GetByIdAsync(loanId);
+        if (loan == null || loan.Status != RequestStatus.Approved)
+        {
+            _logger.LogWarning("Cannot revert loan creation: loan {LoanId} not found or not approved",
+                loanId);
+            return false;
+        }
+
+        try
+        {
+            await _loanRepository.UpdateStatusAsync(loanId, RequestStatus.Rejected);
+
+            if (loan.LoanAccountId.HasValue)
+            {
+                var loanAccount = await _accountRepository.GetByIdAsync(loan.LoanAccountId.Value);
+                if (loanAccount != null)
+                {
+                    var destinationAccount = await _accountRepository.GetByIdAsync(loan.DestinationAccountId);
+                    if (destinationAccount != null && destinationAccount.Balance >= loan.TotalAmount)
+                    {
+                        await _transferService.CreateTransferAsync(new TransferDto
+                        {
+                            SenderId = loan.DestinationAccountId,
+                            ReceiverId = loan.LoanAccountId.Value,
+                            Amount = loan.TotalAmount,
+                            Type = TransferType.Regular,
+                            IsSenderCreditAccount = true
+                        });
+                    }
+                    
+                    loanAccount.Deactivate();
+                    await _accountRepository.UpdateAsync(loanAccount);
+                }
+            }
+        
+            _logger.LogInformation("Successfully reverted loan creation for loan {LoanId}", loanId);
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error reverting loan creation for loan {LoanId}", loanId);
+            return false;
+        }
+    }
+
+    public async Task<bool> RestoreLoanCreationAsync(int loanId)
+    {
+        _logger.LogInformation("Restoration loan creation for loan {LoanId}",
+            loanId);
+        
+        var loan = await _loanRepository.GetByIdAsync(loanId);
+        if (loan == null)
+        {
+            _logger.LogWarning("Cannot restore loan creation: loan {LoanId} not found",
+                loanId);
+            return false;
+        }
+
+        try
+        {
+            await _loanRepository.UpdateStatusAsync(loanId, RequestStatus.Approved);
+
+            if (loan.LoanAccountId.HasValue)
+            {
+                var loanAccount = await _accountRepository.GetByIdAsync(loan.LoanAccountId.Value);
+                if (loanAccount != null)
+                {
+                    loanAccount.Activate();
+                    await _accountRepository.UpdateAsync(loanAccount);
+
+                    await _transferService.CreateTransferAsync(new TransferDto
+                    {
+                        SenderId = loan.LoanAccountId.Value,
+                        ReceiverId = loan.DestinationAccountId,
+                        Amount = loan.TotalAmount,
+                        Type = TransferType.Regular,
+                        IsSenderCreditAccount = true
+                    });
+                }
+            }
+        
+            _logger.LogInformation("Successfully restored loan creation for loan {LoanId}", loanId);
+            return true;
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error restoring loan creation for loan {LoanId}", loanId);
+            return false;
         }
     }
 }

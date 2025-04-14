@@ -44,6 +44,19 @@ public class SalaryProjectRepository : ISalaryProjectRepository
         await _context.SaveChangesAsync();
     }
 
+    public async Task UpdateAsync(SalaryProject salaryProject)
+    {
+        var projectToUpdate = await _context.SalaryProjects.FindAsync(salaryProject.Id);
+        if (projectToUpdate == null)
+        {
+            throw new ArgumentNullException(nameof(projectToUpdate));
+        }
+        
+        projectToUpdate.UpdateDetails(salaryProject.Salary);
+        await _context.SaveChangesAsync();
+    }
+
+
     public async Task DeleteAsync(int projectId)
     {
         var projectToDelete = await _context.SalaryProjects.FindAsync(projectId);
@@ -59,7 +72,7 @@ public class SalaryProjectRepository : ISalaryProjectRepository
     public async Task<IEnumerable<SalaryProject>> GetApprovedSalaryProjectsByBankAsync(int enterpriseId, int bankId)
     {
         return await _context.SalaryProjects
-            .Where(sp => sp.EnterpriseId == enterpriseId && sp.BankId == bankId && sp.Status == SalaryProjectStatus.Approved)
+            .Where(sp => sp.EnterpriseId == enterpriseId && sp.BankId == bankId && sp.Status == SalaryProjectStatus.Approved && sp.IsActive)
             .ToListAsync();
     }
 
@@ -82,7 +95,8 @@ public class SalaryProjectRepository : ISalaryProjectRepository
             .Where(sp =>
                 userEnterpriseIds.Contains(sp.EnterpriseId) &&
                 sp.Status == SalaryProjectStatus.Approved &&
-                sp.BankId == bankId)
+                sp.BankId == bankId &&
+                sp.IsActive)
             .ToListAsync();
     }
 }
