@@ -62,9 +62,6 @@ public class OperationService
                 case "SalaryProjectCreation":
                     success = await _salaryProjectService.RevertSalaryProjectCreationAsync(log.EntityId);
                     break;
-                case "UserCreation":
-                    success = await _userService.RevertUserCreation(log.EntityId);
-                    break;
                 default:
                     _logger.LogWarning("Unsupported operation type for reversal: {OperationType}", log.OperationType);
                     return false;
@@ -125,9 +122,6 @@ public class OperationService
                     break;
                 case "SalaryProjectCreation":
                     success = await _salaryProjectService.RestoreSalaryProjectCreationAsync(log.EntityId);
-                    break;
-                case "UserCreation":
-                    success = await _userService.RestoreUserCreationAsync(log.EntityId);
                     break;
                 default:
                     _logger.LogWarning("Unsupported operation type for restoration: {OperationType}", log.OperationType);
